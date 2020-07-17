@@ -8,15 +8,14 @@ Document Author: Tay Kratzer tay@cimitra.com
 [ARCHITECTURE]
 All the PowerShell scripts use these two files:
 
-1. settings.cfg
-- A simple text file with a syntax of VARIABLE=VALUE, for example: SERVER_ADDRESS=192.168.1.2
+1. **settings.cfg**
+- A simple text file with a syntax of VARIABLE=VALUE, for example: **SERVER_ADDRESS=192.168.1.2**
 
-2. config_reader.ps1
-- The config_reader.ps1 script is sourced by all the other PowerShell scripts so that they can benefit from the config_reader.ps1's ability to read from the settings.cfg file
+2. **config_reader.ps1**
+- The config_reader.ps1 script is sourced by all the other PowerShell scripts so that they can benefit from the ability of the config_reader.ps1 script to read from the settings.cfg file
 
 [THE SCRIPTS]
-This is a group of PowerShell scripts that use a common configuration file (settings.cfg). If you edit the configuration file, then you need not change the scripts in any fashion.
-This method of common configuration makes it easy to use these scripts without any need to change the scripts in any fashion. 
+This is a group of PowerShell scripts that use a common configuration file (**settings.cfg**) and common script (**config_reader.ps1**) to create on place to set variables in all of the scripts. If you edit the configuration file, then you need not change the scripts in any fashion.
 
 The PowerShell scripts allow for the following: 
 
