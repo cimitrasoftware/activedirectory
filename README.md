@@ -1,9 +1,11 @@
 # activedirectory
-Document Author: Tay Kratzer tay@cimitra.com
+Document Author: Tay Kratzer **tay@cimitra.com**
 
 [BIG PICTURE]
 1. Create a method in which PowerShell script files read their configuration settings from a simple text file that anyone can understand. 
 2. Make this method portable to anyone else who wants to use this method in their own PowerShell scripts
+
+It should be very easy for you to take the **config_reader.ps1** script and user it in your own PowerShell scripts in order to store variables in an external file, rather than inside a PowerShell script. Enjoy!
 
 [ARCHITECTURE]
 All the PowerShell scripts use these two files:
