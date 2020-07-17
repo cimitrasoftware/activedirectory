@@ -16,8 +16,15 @@ All the PowerShell scripts use these two files:
 2. **config_reader.ps1**
 - The config_reader.ps1 script is sourced by all the other PowerShell scripts so that they can benefit from the ability of the config_reader.ps1 script to read from the settings.cfg file
 
+[HACKING THIS SOLUTION FOR YOUR OWN USE]
+
+1. Look at the script NewUser.ps1. It is very clearly documented. 
+2. The one variable to concentrate on is:  **"$context"**. 
+3. The $context variable is mapped to a variable within the settings.cfg file via a variable such as: "AD_USER_CONTEXT"
+4. The concepts documented in the Newuser.ps1 file are completely portable to your own PowerShell scripts. 
+
 [THE SCRIPTS]
-This is a group of PowerShell scripts that use a common configuration file (**settings.cfg**) and common script (**config_reader.ps1**) to create on place to set variables in all of the scripts. If you edit the configuration file, then you need not change the scripts in any fashion.
+This group of PowerShell scripts use a common configuration file (**settings.cfg**) and common script (**config_reader.ps1**) to create on place to set variables in all of the scripts. If you edit the configuration file, then you need not change the scripts in any fashion.
 
 The PowerShell scripts allow for the following: 
 
