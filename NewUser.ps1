@@ -1,4 +1,4 @@
-﻿# Create a New User in Active Directory
+# Create a New User in Active Directory
 # Author: Tay Kratzer tay@cimitra.com
 # Change the context variable to match your system
 # -------------------------------------------------
@@ -9,17 +9,22 @@ $context = "OU=USERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
  # Example: AD_USER_CONTEXT=OU=COMPUTERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com
  # -------------------------------------------------
 
-# If a settings.cfg file exists read it and get the Active Directory Context from this file
+# Look to see if a config_reader.ps1 file exists in order to use it's functionality
 if((Test-Path ${PSScriptRoot}\config_reader.ps1)){
 
+# If a settings.cfg file exists, let's use that file to reading in variables
 if((Test-Path ${PSScriptRoot}\settings.cfg))
 {
+# Give a short name to the config_reader.ps1 script
 $CONFIG_IO="${PSScriptRoot}\config_reader.ps1"
 
+# Source in the configuration reader script
 . $CONFIG_IO
 
+# Use the "ReadFromConfigFile" function in the configuration reader script
 $CONFIG=(ReadFromConfigFile "${PSScriptRoot}\settings.cfg")
 
+# Map the $context variable to the AD_USER_CONTEXT variable read in from the settings.cfg file
 $context = "$CONFIG$AD_USER_CONTEXT"
 }
 
@@ -43,11 +48,14 @@ Write-Host ""
 exit 0
 }
 
+# This script expects 3 arguments, so if the 3rd argument is blank, then show the Help and exit
 if (!$args[2]){ 
 ShowHelp
  }
 # -------------------------------------------------
 
+
+# If a fourth argument is sent into this script, that fourth argument will be mapped to the $context variable
 
 if ($args[3]) { 
 
@@ -75,11 +83,18 @@ New-ADUser -Name "$firstNameIn $lastNameIn" -GivenName "$firstNameIn" -Surname "
 # Catch the exit code from running the command
 $theResult = $?
 
+# If exit code from the New-ADUser command was "True" then show a success message
 if ($theResult)
 {
 Write-Output ""
 Write-Output ""
 Write-Output "New User ${firstNameIn} ${lastNameIn} created in Active Directory"
+Write-Output ""
+}else{
+Write-Output ""
+Write-Output ""
+Write-Output "User ${firstNameIn} ${lastNameIn} NOT created in Active Directory"
+Write-Output ""
 }
 
 # Enable the account
