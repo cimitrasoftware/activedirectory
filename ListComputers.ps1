@@ -119,13 +119,15 @@ Write-Output ""
 Write-Output "Following is a list of all of the computers, newest to oldest."
 Write-Output ""
 Write-Output "------------------------------------------------------"
+
+
 function reverse
 { 
 
 # listComputersResult
 
 try{
- $arr = @(Get-ADComputer -Filter * -SearchBase $context | Select Name)
+ $arr = @(Get-ADComputer -Filter * -SearchBase $context -Property * | Select-Object  Name,Operatingsystem,whenCreated,whenChanged)
  }catch{$err = "$_"
  $global:err = $err
  $global:listComputersResult = $false
@@ -135,7 +137,7 @@ try{
     if ($listComputersResult)
     {
         [array]::reverse($arr)
-        $arr
+        $arr | fl
     }
 
 }
