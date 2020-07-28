@@ -57,21 +57,6 @@ if (Write-Output "$args" | Select-String -CaseSensitive "-showErrors" ){
 $verboseOutputSet = $true
 }
 
-# If a settings.cfg file exists read it and get the Active Directory Context from this file
-if((Test-Path ${PSScriptRoot}\config_reader.ps1)){
-
-if((Test-Path ${PSScriptRoot}\settings.cfg))
-{
-$CONFIG_IO="${PSScriptRoot}\config_reader.ps1"
-
-. $CONFIG_IO
-
-$CONFIG=(ReadFromConfigFile "${PSScriptRoot}\settings.cfg")
-
-}
-
-}
-# -------------------------------------------------
 
 
 function  Get-DistinguishedName {
@@ -116,7 +101,7 @@ Write-Output ""
 Write-Output "------------------------------------------------------------------"
 Write-Output ""
 try{
-@(Get-ADComputer -Filter * -SearchBase $context ) | Get-DistinguishedName
+@(Get-ADComputer -Filter * ) | Get-DistinguishedName
 $global:actionResult = $true
 }catch{
 $err = "$_"
