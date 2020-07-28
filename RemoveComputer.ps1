@@ -37,6 +37,7 @@ $context = "$CONFIG$AD_COMPUTER_CONTEXT"
 
 $computerNameInSet = $false
 $contextInSet = $false
+$setContextInSet = $false
 $verboseOutputSet = $false
 $deleteComputerResult = $true
 
@@ -71,19 +72,29 @@ $computerNameInSet = $true
 function ShowHelp{
 $scriptName = Split-Path -leaf $PSCommandpath
 Write-Host ""
-Write-Host "Help"
+Write-Host "Remove a Computer From Active Directory"
+Write-Host ""
+Write-Host "[ HELP ]"
 Write-Host ""
 Write-Host ".\$scriptName -h or -help"
-Write-Host "".
-Write-Host "Script Usage"
 Write-Host ""
-Write-Host ".\$scriptName -computerNameIn <current computer name> -contextIn <Active Directory context (optional if specified otherwise)>"
+Write-Host "[ SCRIPT USAGE ]"
+Write-Host ""
+Write-Host ".\$scriptName -computerNameIn <current computer name> -contextIn <Active Directory context (optional if specified in settings.cfg)>"
+Write-Host ""
+Write-Host "[ EXAMPLES ]"
 Write-Host ""
 Write-Host "Example: .\$scriptName -computerNameIn WIN7BOX"
 Write-Host ""
 Write-Host "-OR-"
 Write-Host ""
+Write-Host "Example: .\$scriptName -setContext OU=COMPUTERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com -computerNameIn WIN7BOX"
+Write-Host ""
+Write-Host "-OR-"
+Write-Host ""
 Write-Host "Example: .\$scriptName -computerNameIn WIN7BOX -contextIn OU=COMPUTERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
+Write-Host ""
+Write-Host "[ ERROR HANDLING ]"
 Write-Host ""
 Write-Host "-showErrors = Show Error Messages"
 Write-Host ""
@@ -104,6 +115,20 @@ ShowHelp
  }
 # -------------------------------------------------
 
+
+if($setContextIn.Length -gt 2){
+$setContextInSet = $true
+}
+
+if ($contextInSet){ 
+    $context = $contextIn
+    Write-Output ""
+    Write-Output "Modify User in Context: $context"
+}else{
+    if($setContextInSet){
+    $context = $setContextIn
+    }
+}
 
 
 # Use Remove-ADComputer to remove the computer

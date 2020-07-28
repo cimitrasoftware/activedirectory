@@ -1,31 +1,45 @@
-﻿# List Computers in Active Directory
-# Author: Tay Kratzer tay@cimitra.com
-# Change the context variable to match your system
-# -------------------------------------------------
-$context = "OU=COMPUTERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com" 
- # - OR -
- # Specify the context in settings.cfg file
- # Use this format: AD_COMPUTER_CONTEXT=<ACTIVE DIRECTORY CONTEXT>
- # Example: AD_COMPUTER_CONTEXT=OU=COMPUTERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com
- # -------------------------------------------------
+﻿# Check Password Set Date in Active Directory
+# Co-Author: Tay Kratzer tay@cimitra.com
+
 
  $verboseOutputSet = $false
- $contextInSet = $false
+
+ # If a settings.cfg file exists read it and get the Active Directory Context from this file
+if((Test-Path ${PSScriptRoot}\config_reader.ps1)){
+
+if((Test-Path ${PSScriptRoot}\settings.cfg))
+{
+$CONFIG_IO="${PSScriptRoot}\config_reader.ps1"
+
+. $CONFIG_IO
+
+$CONFIG=(ReadFromConfigFile "${PSScriptRoot}\settings.cfg")
+
+}
+
+}
+# -------------------------------------------------
 
 
 # Show Help
 function ShowHelp{
 $scriptName = Split-Path -leaf $PSCommandpath
 Write-Host ""
-Write-Host "Help"
+Write-Host "List All Computers in Active Directory In Every OU"
+Write-Host ""
+Write-Host "[ HELP ]"
 Write-Host ""
 Write-Host ".\$scriptName -h or -help"
 Write-Host ""
-Write-Host "Script Usage"
+Write-Host "[ SCRIPT USAGE ]"
 Write-Host ""
 Write-Host ".\$scriptName"
 Write-Host ""
+Write-Host "[ EXAMPLE ]"
+Write-Host ""
 Write-Host "Example: .\$scriptName"
+Write-Host ""
+Write-Host "[ ERROR HANDLING ]"
 Write-Host ""
 Write-Host "-showErrors = Show Error Messages"
 Write-Host ""
@@ -54,25 +68,11 @@ $CONFIG_IO="${PSScriptRoot}\config_reader.ps1"
 
 $CONFIG=(ReadFromConfigFile "${PSScriptRoot}\settings.cfg")
 
-$context = "$CONFIG$AD_COMPUTER_CONTEXT"
 }
 
 }
 # -------------------------------------------------
 
-
-if(Write-Output $args | Select-String '-contextIn'){
-$theArgs = $MyInvocation.Line
-$contextIn = $theArgs  -split "(?<=-contextIn)\s" | Select -Skip 1 -First 1
-$contextInSet = $true
-}
-
-
-if ($contextInSet) { 
-$context = $contextIn
-Write-Output ""
-Write-Output "List Computers in Context: $context"
-}
 
 function  Get-DistinguishedName {
     param (

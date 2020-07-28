@@ -4,20 +4,42 @@
 
 $verboseOutputSet = $false
 
+# If a settings.cfg file exists read it and get the Active Directory Context from this file
+if((Test-Path ${PSScriptRoot}\config_reader.ps1)){
+
+if((Test-Path ${PSScriptRoot}\settings.cfg))
+{
+$CONFIG_IO="${PSScriptRoot}\config_reader.ps1"
+
+. $CONFIG_IO
+
+$CONFIG=(ReadFromConfigFile "${PSScriptRoot}\settings.cfg")
+
+}
+
+}
+# -------------------------------------------------
+
 
 # Show Help
 function ShowHelp{
 $scriptName = Split-Path -leaf $PSCommandpath
 Write-Host ""
-Write-Host "Help"
+Write-Host "List All Users in Active Directory In Every OU"
+Write-Host ""
+Write-Host "[ HELP ]"
 Write-Host ""
 Write-Host ".\$scriptName -h or -help"
 Write-Host ""
-Write-Host "Script Usage"
+Write-Host "[ SCRIPT USAGE ]"
 Write-Host ""
 Write-Host ".\$scriptName"
 Write-Host ""
+Write-Host "[ EXAMPLE ]"
+Write-Host ""
 Write-Host "Example: .\$scriptName"
+Write-Host ""
+Write-Host "[ ERROR HANDLING ]"
 Write-Host ""
 Write-Host "-showErrors = Show Error Messages"
 Write-Host ""

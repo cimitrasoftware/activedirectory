@@ -10,6 +10,7 @@ $context = "OU=COMPUTERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
  # -------------------------------------------------
 
 $contextInSet = $false
+$setContextInSet = $false
 $global:listComputersResult = $true
 $verboseOutputSet = $false
 
@@ -46,19 +47,33 @@ $sleepTime = "$CONFIG$AD_SCRIPT_SLEEP_TIME"
 function ShowHelp{
 $scriptName = Split-Path -leaf $PSCommandpath
 Write-Host ""
-Write-Host "Script Usage"
+Write-Host "List Computers in Active Directory"
 Write-Host ""
-Write-Host ".\$scriptName -contextIn <Active Directory context (optional if specified otherwise)>"
+Write-Host "[ HELP ]"
+Write-Host ""
+Write-Host ".\$scriptName -h or -help"
+Write-Host ""
+Write-Host "[ SCRIPT USAGE ]"
+Write-Host ""
+Write-Host ".\$scriptName -contextIn <Active Directory context (optional if specified in settings.cfg file)>"
+Write-Host ""
+Write-Host "[ EXAMPLES ]"
 Write-Host ""
 Write-Host "Example: .\$scriptName"
 Write-Host ""
 Write-Host "-OR-"
 Write-Host ""
+Write-Host "Example: .\$scriptName -setContext OU=COMPUTERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
+Write-Host ""
+Write-Host "-OR-"
+Write-Host ""
 Write-Host "Example: .\$scriptName -contextIn OU=COMPUTERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
+Write-Host ""
+Write-Host "[ ERROR HANDLING ]"
 Write-Host ""
 Write-Host "-showErrors = Show Error Messages"
 Write-Host ""
-Write-Host "Example: .\$scriptName -showErrors -contextIn OU=COMPUTERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
+Write-Host "Example: .\$scriptName -showErrors"
 Write-Host ""
 exit 0
 }
@@ -81,10 +96,23 @@ if($contextIn.Length -gt 2){
 $contextInSet = $true
 }
 
-if ($contextInSet) { 
-$context = $contextIn
-Write-Output ""
-Write-Output "List Computers in Context: $context"
+if(Write-Output $args | Select-String '-setContext'){
+$theArgs = $MyInvocation.Line
+$setContextIn = $theArgs  -split "(?<=-setContext)\s" | Select -Skip 1 -First 1
+}
+
+if($setContextIn.Length -gt 2){
+$setContextInSet = $true
+}
+
+if ($contextInSet){ 
+    $context = $contextIn
+    Write-Output ""
+    Write-Output "Modify User in Context: $context"
+}else{
+    if($setContextInSet){
+    $context = $setContextIn
+    }
 }
 
 Write-Output ""

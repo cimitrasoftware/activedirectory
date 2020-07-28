@@ -13,6 +13,7 @@ $firstNameInSet = $false
 $lastNameInSet = $false
 $passwordInSet = $false
 $contextInSet = $false
+$setContextInSet = $false
 $verboseOutputSet = $false
 $global:forcePasswordResetSet = $false
 $createUserResult = $true
@@ -109,27 +110,39 @@ Start-Sleep -s $sleepTime
 function ShowHelp{
 $scriptName = Split-Path -leaf $PSCommandpath
 Write-Host ""
-Write-Host "Help"
+Write-Host "Create User in Active Directory"
+Write-Host ""
+Write-Host "[ HELP ]"
 Write-Host ""
 Write-Host ".\$scriptName -h or -help"
 Write-Host ""
-Write-Host "Script Usage"
+Write-Host "[ SCRIPT USAGE ]"
 Write-Host ""
-Write-Host ".\$scriptName -firstNameIn <user first name> -lastNameIn <user last name> -passwordIn <password> -contextIn <Active Directory context (optional if specified otherwise)>"
+Write-Host ".\$scriptName -firstNameIn <user first name> -lastNameIn <user last name> -passwordIn <password> -contextIn <Active Directory context (optional if specified in settings.cfg)>"
+Write-Host ""
+Write-Host "[ EXAMPLES ]"
 Write-Host ""
 Write-Host "Example: .\$scriptName -firstNameIn Jane -lastNameIn Doe -passwordIn p433w0r9_ch4ng3"
 Write-Host ""
 Write-Host "-OR-"
 Write-Host ""
+Write-Host "Example: .\$scriptName -setContext OU=USERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com -firstNameIn Jane -lastNameIn Doe -passwordIn p433w0r9_ch4ng3"
+Write-Host ""
+Write-Host "-OR-"
+Write-Host ""
 Write-Host "Example: .\$scriptName -firstNameIn Jane -lastNameIn Doe -passwordIn p433w0r9_ch4ng3 -contextIn OU=USERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
+Write-Host ""
+Write-Host "[ ERROR HANDLING ]"
 Write-Host ""
 Write-Host "-showErrors = Show Error Messages"
 Write-Host ""
 Write-Host "Example: .\$scriptName -showErrors -firstNameIn Jane -lastNameIn Doe -passwordIn p433w0r9_ch4ng3 -contextIn OU=USERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
 Write-Host ""
+Write-Host "[ PREFERENCES ]"
+Write-Host ""
 Write-Host "-forcePasswordReset = Force a Password Reset on Next User Login"
 Write-Host ""
-Write-Host "Example: .\$scriptName -forcePasswordReset -firstNameIn Jane -lastNameIn Doe -passwordIn p433w0r9_ch4ng3 -contextIn OU=USERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
+Write-Host "Example: .\$scriptName -forcePasswordReset -firstNameIn Jane -lastNameIn Doe -passwordIn p433w0r9_ch4ng3"
 Write-Host ""
 exit 0
 }
@@ -149,10 +162,23 @@ ShowHelp
 
 # If a fourth argument is sent into this script, that fourth argument will be mapped to the $context variable
 
-if ($contextInSet) { 
-$context = $contextIn
-Write-Output ""
-Write-Output "Create User in Context: $context"
+if(Write-Output $args | Select-String '-setContext'){
+$theArgs = $MyInvocation.Line
+$setContextIn = $theArgs  -split "(?<=-setContext)\s" | Select -Skip 1 -First 1
+}
+
+if($setContextIn.Length -gt 2){
+$setContextInSet = $true
+}
+
+if ($contextInSet){ 
+    $context = $contextIn
+    Write-Output ""
+    Write-Output "Modify User in Context: $context"
+}else{
+    if($setContextInSet){
+    $context = $setContextIn
+    }
 }
 
 # Make the samAccountName variable from a combination of the user's first and last name

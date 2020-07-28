@@ -12,6 +12,7 @@ $context = "OU=COMPUTERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
 $computerNameInSet = $false
 $newComputerNameInSet = $false
 $contextInSet = $false
+$setContextInSet = $false
 $verboseOutputSet = $false
 $global:renameComputerResult = $true
 
@@ -56,8 +57,11 @@ $newComputerNameIn = [string]::join(" ",($newComputerNameIn.Split("`n"))).Trim()
 }else{
 $theArgs = $MyInvocation.Line
 $newComputerNameIn = $theArgs  -split "(?<=-newComputerNameIn)\s" | Select -Skip 1 -First 1
-$newComputerNameIn = [string]::join(" ",($newComputerNameIn.Split("`n"))).Trim()
+try{
+$newComputerNameIn = [string]::join(" ",($newComputerNameIn.Split("`n"))).Trim() 
+}catch{}
 }
+
 
 if(Write-Output $args | Select-String '-contextIn'){
 $theArgs = $MyInvocation.Line
@@ -87,21 +91,36 @@ $contextInSet = $true
 function ShowHelp{
 $scriptName = Split-Path -leaf $PSCommandpath
 Write-Host ""
-Write-Host "Help"
+Write-Host "Rename Computer in Active Directory"
+Write-Host ""
+Write-Host "[ HELP ]"
 Write-Host ""
 Write-Host ".\$scriptName -h or -help"
 Write-Host ""
-Write-Host "Script Usage"
+Write-Host "[ SCRIPT USAGE ]"
 Write-Host ""
-Write-Host ".\$scriptName -computerNameIn <current computer name> -newComputerNameIn <new computer name> -contextIn <Active Directory context (optional if specified otherwise)>"
+Write-Host ".\$scriptName -computerNameIn <current computer name> -newComputerNameIn <new computer name> -contextIn <Active Directory context (optional if specified in settings.cfg file)>"
+Write-Host ""
+Write-Host "-OR-"
+Write-Host ""
+Write-Host ".\$scriptName -setContext <Active Directory context (optional if specifed in settings.cfg file)> -computerNameIn <current computer name> -newComputerNameIn <new computer name>"
+Write-Host ""
+Write-Host "[ EXAMPLES ]"
 Write-Host ""
 Write-Host "Example: .\$scriptName -computerNameIn WIN7BOX -newComputerNameIn WIN10BOX"
 Write-Host ""
 Write-Host "-OR-"
 Write-Host ""
+Write-Host "Example: .\$scriptName -setContext OU=COMPUTERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com -computerNameIn WIN7BOX -newComputerNameIn WIN10BOX"
+Write-Host ""
+Write-Host "-OR-"
+Write-Host ""
 Write-Host "Example: .\$scriptName -computerNameIn WIN7BOX -newComputerNameIn WIN10BOX -contextIn OU=COMPUTERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
 Write-Host ""
+Write-Host "[ ERROR HANDLING ]"
+Write-Host ""
 Write-Host "-showErrors = Show Error Messages"
+Write-Host ""
 Write-Host ""
 Write-Host "Example: .\$scriptName -showErrors -computerNameIn WIN7BOX -newComputerNameIn WIN10BOX -contextIn OU=COMPUTERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
 Write-Host ""
@@ -113,10 +132,30 @@ if (Write-Output $args | Select-String "\-h\b|\-help\b" )
 ShowHelp
 }
 
-
 if (!($computerNameInSet -and $newComputerNameInSet)){
 ShowHelp
 }
+
+
+if(Write-Output $args | Select-String '-setContext'){
+$theArgs = $MyInvocation.Line
+$setContextIn = $theArgs  -split "(?<=-setContext)\s" | Select -Skip 1 -First 1
+}
+
+if($setContextIn.Length -gt 2){
+$setContextInSet = $true
+}
+
+if ($contextInSet){ 
+    $context = $contextIn
+    Write-Output ""
+    Write-Output "Modify User in Context: $context"
+}else{
+    if($setContextInSet){
+    $context = $setContextIn
+    }
+}
+
 
 
 try{

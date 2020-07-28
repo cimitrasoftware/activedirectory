@@ -12,6 +12,7 @@ $context = "OU=COMPUTERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
 $computerNameInSet = $false
 $computerTypeInSet = $false
 $contextInSet = $false
+$setContextInSet = $false
 $verboseOutputSet = $false
 $createComputerResult = $true
 $sleepTime = 5
@@ -84,19 +85,29 @@ $contextInSet = $true
 function ShowHelp{
 $scriptName = Split-Path -leaf $PSCommandpath
 Write-Host ""
-Write-Host "Help"
+Write-Host "Create Computer in Active Directory"
+Write-Host ""
+Write-Host "[ HELP ]"
 Write-Host ""
 Write-Host ".\$scriptName -h or -help"
 Write-Host ""
-Write-Host "Script Usage"
+Write-Host "[ SCRIPT USAGE ]"
 Write-Host ""
-Write-Host ".\$scriptName -computerNameIn <ComputerName> -computerTypeIn <Computer Type 1=Mac, 2=Windows, 3=Linux, 4=Linux, 5=Other><Active Directory context (optional if specified otherwise)>"
+Write-Host ".\$scriptName -computerNameIn <ComputerName> -computerTypeIn <Computer Type 1=Mac, 2=Windows, 3=Linux, 4=Linux, 5=Other> -contextIn <Active Directory context (optional if specified in settings.cfg)>"
+Write-Host ""
+Write-Host "[ EXAMPLES ]"
 Write-Host ""
 Write-Host "Example: .\$scriptName -computerNameIn WIN10BOX_ONE -computerTypeIn 2"
 Write-Host ""
 Write-Host "-OR-"
 Write-Host ""
+Write-Host "Example: .\$scriptName -setContext OU=COMPUTERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com -computerNameIn WIN10BOX_ONE -computerTypeIn 2"
+Write-Host ""
+Write-Host "-OR-"
+Write-Host ""
 Write-Host "Example: .\$scriptName -computerNameIn WIN10BOX_ONE -computerTypeIn 2 -contextIn OU=COMPUTERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
+Write-Host ""
+Write-Host "[ ERROR HANDLING ]"
 Write-Host ""
 Write-Host "-showErrors = Show Error Messages"
 Write-Host ""
