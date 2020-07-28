@@ -419,13 +419,16 @@ Remove-Item -Path $TEMP_FILE_ONE -Force 2>&1 | out-null
 
 
 function CREATE_CIMITRA_APP{
-
+# BLISS
 $AppNameIn=$args[0]
 $AppScriptIn=$args[1]
 $ParentFolderIdIn=$args[2]
 $ExcludeFolderIdIn=$args[3]
 $jsonFileIn=$args[4]
 
+if ( CHECK_FOR_EXISTING_APP "${ParentFolderIdIn}" "${adAdminFolderId}" "${AppScriptIn}" ){
+return
+}
 
 if ( CHECK_FOR_EXISTING_APP "${ParentFolderIdIn}" "${ExcludeFolderIdIn}" "${AppScriptIn}" ){
 return
@@ -529,6 +532,8 @@ function GET_FOLDER_IDS{
 
 $TEMP_FILE_ONE=New-TemporaryFile
 
+# Get User's Root Folder
+
 Invoke-RestMethod -Uri $uri/apps -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
 
 $rootFolderIdOne = (Get-Content $TEMP_FILE_ONE | Select-String -SimpleMatch -CaseSensitive 'Home Folder -' -Context 1 | Select-Object -First 1 ) 
@@ -539,7 +544,11 @@ $rootFolderIdThree = ( $rootFolderIdTwo | %{ $_.Split(':')[1];} )
 
 $rootFolderId = $rootFolderIdThree.Trim()
 
+# Got User's Root Folder Id
+
 Remove-Item -Path $TEMP_FILE_ONE -Force 2>&1 | out-null
+
+# Got User's Root Folder's Children
 
 Invoke-RestMethod -Uri $uri/apps/$rootFolderId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
 
@@ -547,7 +556,67 @@ $CONFIG_IO="${PSScriptRoot}\config_reader.ps1"
 
 . $CONFIG_IO
 
-$CONFIG=(ReadFromConfigFile "${PSScriptRoot}\settings.cfg") 2>&1 | out-null
+
+Set-Variable -Name ACTIVE_DIRECTORY_MAIN_FOLDER -Value 'ACTIVE DIRECTORY'
+
+# Look for the ACTIVE DIRECTORY folder
+
+if ((Get-Content "$TEMP_FILE_ONE" | Select-String -CaseSensitive "\b${ACTIVE_DIRECTORY_MAIN_FOLDER}\b" )){
+
+$adRootFolderIdOne = (Get-Content $TEMP_FILE_ONE | Select-String -SimpleMatch -CaseSensitive "${ACTIVE_DIRECTORY_MAIN_FOLDER}" -Context 1 | Select-Object -First 1 ) 
+
+$adRootFolderIdTwo = ($adRootFolderIdOne -split '\n')[0]
+
+$adRootFolderIdThree = ( $adRootFolderIdTwo | %{ $_.Split(':')[1];} )
+
+$adRootFolderId = $adRootFolderIdThree.Trim()
+
+$global:adRootFolderId = $adRootFolderId
+
+Remove-Item -Path $TEMP_FILE_ONE -Force 2>&1 | out-null
+
+# Get the ACTIVE DIRECTORY folder's children
+
+
+Invoke-RestMethod -Uri $uri/apps/$adRootFolderId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
+
+}else{
+Write-Output "Error: Cannot Create or Discover the Folder: ${ACTIVE_DIRECTORY_MAIN_FOLDER}"
+Remove-Item -Path $TEMP_FILE_ONE -Force
+exit 1
+}
+
+# Get the ACTIVE DIRECTORY | ADMIN folder
+# BLISS
+$CONFIRM_ADMIN_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_ADMIN_FOLDER_LABEL")
+
+if ( $CONFIRM_ADMIN_FOLDER ) 
+{ 
+Set-Variable -Name ACTIVE_DIRECTORY_ADMIN_FOLDER_LABEL -Value $CONFIG$ACTIVE_DIRECTORY_ADMIN_FOLDER_LABEL }
+else{
+Set-Variable -Name ACTIVE_DIRECTORY_ADMIN_FOLDER_LABEL -Value 'ADMIN' 
+}
+
+
+
+if ((Get-Content "$TEMP_FILE_ONE" | Select-String -CaseSensitive "\b${ACTIVE_DIRECTORY_ADMIN_FOLDER_LABEL}\b" )){
+
+$adAdminFolderIdOne = (Get-Content $TEMP_FILE_ONE | Select-String -SimpleMatch -CaseSensitive "${ACTIVE_DIRECTORY_ADMIN_FOLDER_LABEL}" -Context 1 | Select-Object -First 1 ) 
+
+$adAdminFolderIdTwo = ($adAdminFolderIdOne -split '\n')[0]
+
+$adAdminFolderIdThree = ( $adAdminFolderIdTwo | %{ $_.Split(':')[1];} )
+
+$adAdminFolderId = $adAdminFolderIdThree.Trim()
+
+$global:adAdminFolderId = $adAdminFolderId
+
+}else{
+Write-Output "Error: Cannot Create or Discover the Folder: ${ACTIVE_DIRECTORY_ADMIN_FOLDER_LABEL}"
+Remove-Item -Path $TEMP_FILE_ONE -Force
+exit 1
+}
+
 
 $CONFIRM_DELEGATE_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL")
 
@@ -555,8 +624,11 @@ if ( $CONFIRM_DELEGATE_FOLDER )
 { 
 Set-Variable -Name ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL -Value $CONFIG$ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL }
 else{
-Set-Variable -Name ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL -Value 'ACTIVE DIRECTORY DELEGATED' 
+Set-Variable -Name ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL -Value 'DELEGATE' 
 }
+
+# Get the ACTIVE DIRECTORY | DELGATE folder
+
 
 if ((Get-Content "$TEMP_FILE_ONE" | Select-String -CaseSensitive "\b${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL}\b" )){
 
@@ -576,13 +648,16 @@ Remove-Item -Path $TEMP_FILE_ONE -Force
 exit 1
 }
 
+
+# Get the ACTIVE DIRECTORY | EXCLUDE folder
+
 $CONFIRM_EXCLUDE_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_EXCLUDED_FOLDER_LABEL")
 
 if ( $CONFIRM_EXCLUDE_FOLDER ) 
 { 
 Set-Variable -Name ACTIVE_DIRECTORY_EXCLUDED_FOLDER_LABEL -Value $CONFIG$ACTIVE_DIRECTORY_EXCLUDED_FOLDER_LABEL }
 else{
-Set-Variable -Name ACTIVE_DIRECTORY_EXCLUDED_FOLDER_LABEL -Value 'ACTIVE DIRECTORY EXCLUDED' 
+Set-Variable -Name ACTIVE_DIRECTORY_EXCLUDED_FOLDER_LABEL -Value 'EXCLUDE' 
 }
 
 if ((Get-Content "$TEMP_FILE_ONE" | Select-String -CaseSensitive "\b${ACTIVE_DIRECTORY_EXCLUDED_FOLDER_LABEL}\b" )){
@@ -603,6 +678,8 @@ Remove-Item -Path $TEMP_FILE_ONE -Force
 exit 1
 }
 
+# Get the ACTIVE DIRECTORY | DELGATE folder's children
+
 Invoke-RestMethod -Uri $uri/apps/$adFolderId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
 
 $CONFIRM_USER_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL")
@@ -613,6 +690,8 @@ Set-Variable -Name ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL -Value $CONFIG$
 else{
 Set-Variable -Name ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL -Value 'USER MANAGEMENT' 
 }
+
+# Get the ACTIVE DIRECTORY | DELGATE | USER MANAGEMENT folder
 
 if ((Get-Content "$TEMP_FILE_ONE" | Select-String -CaseSensitive "\b${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL}\b" )){
 
@@ -631,6 +710,8 @@ Write-Output "Error: Cannot Create or Discover the Folder: ${ACTIVE_DIRECTORY_DE
 Remove-Item -Path $TEMP_FILE_ONE -Force
 exit 1
 }
+
+# Get the ACTIVE DIRECTORY | DELGATE | COMPUTER MANAGEMENT folder
 
 $CONFIRM_COMPUTER_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_COMPUTER_MANAGEMENT_FOLDER_LABEL")
 
@@ -675,6 +756,8 @@ $TEMP_FILE_ONE=New-TemporaryFile
 
 Invoke-RestMethod -Uri $uri/apps -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
 
+# Get Home Folder
+
 $rootFolderIdOne = (Get-Content $TEMP_FILE_ONE | Select-String -SimpleMatch -CaseSensitive 'Home Folder -' -Context 1 | Select-Object -First 1 ) 
 
 $rootFolderIdTwo = ($rootFolderIdOne -split '\n')[0]
@@ -684,6 +767,8 @@ $rootFolderIdThree = ( $rootFolderIdTwo | %{ $_.Split(':')[1];} )
 $rootFolderId = $rootFolderIdThree.Trim()
 
 Remove-Item -Path $TEMP_FILE_ONE -Force
+
+# Get Children of Home Folder
 
 Invoke-RestMethod -Uri $uri/apps/$rootFolderId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
 
@@ -695,13 +780,69 @@ $CONFIG_IO="${PSScriptRoot}\config_reader.ps1"
 
 $CONFIG=(ReadFromConfigFile "${PSScriptRoot}\settings.cfg") 2>&1 | out-null
 
-$CONFIRM_FOLDER_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL")
+Set-Variable -Name ACTIVE_DIRECTORY_MAIN_FOLDER -Value 'ACTIVE DIRECTORY'
+
+# See if the ACTIVE DIRECTORY folder exists, if not create it
+
+if ((Get-Content "$TEMP_FILE_ONE" | Select-String -CaseSensitive ": ${ACTIVE_DIRECTORY_MAIN_FOLDER}" )){
+Write-Output ""
+Write-Output "${ACTIVE_DIRECTORY_MAIN_FOLDER} Folder Exists"
+}else{
+Write-Output "${ACTIVE_DIRECTORY_MAIN_FOLDER} Folder Create"
+CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_MAIN_FOLDER}" "Cimitra Active Directory Main Folder." "$rootFolderId"
+Invoke-RestMethod -Uri $uri/apps/$rootFolderId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
+}
+
+# Write-Output "$TEMP_FILE_ONE"
+
+# Discover the ACTIVE DIRECTORY folder Id
+
+# Write-Output "ACTIVE_DIRECTORY_MAIN_FOLDER = $ACTIVE_DIRECTORY_MAIN_FOLDER"
+
+
+$adRootFolderIdOne = (Get-Content $TEMP_FILE_ONE | Select-String -SimpleMatch -CaseSensitive ": ${ACTIVE_DIRECTORY_MAIN_FOLDER}" -Context 1 | Select-Object -First 1 ) 
+
+
+$adRootFolderIdTwo = ($adRootFolderIdOne -split '\n')[0]
+
+$adRootFolderIdThree = ( $adRootFolderIdTwo | %{ $_.Split(':')[1];} )
+
+$adRootFolderId = $adRootFolderIdThree.Trim()
+
+
+# Discover the ACTIVE DIRECTORY folder children
+
+Invoke-RestMethod -Uri $uri/apps/$adRootFolderId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
+
+# Get or create the ACTIVE DIRECTORY | ADMIN folder
+
+$CONFIRM_ADMIN_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_ADMIN_FOLDER_LABEL")
+
+if ( $CONFIRM_ADMIN_FOLDER ) 
+{ 
+Set-Variable -Name ACTIVE_DIRECTORY_ADMIN_FOLDER_LABEL -Value $CONFIG$ACTIVE_DIRECTORY_ADMIN_FOLDER_LABEL }
+else{
+Set-Variable -Name ACTIVE_DIRECTORY_ADMIN_FOLDER_LABEL -Value 'ADMIN' 
+}
+
+if ((Get-Content "$TEMP_FILE_ONE" | Select-String -CaseSensitive ": ${ACTIVE_DIRECTORY_ADMIN_FOLDER_LABEL}" )){
+Write-Output ""
+Write-Output "${ACTIVE_DIRECTORY_ADMIN_FOLDER_LABEL} Folder Exists"
+}else{
+Write-Output ""
+Write-Output "${ACTIVE_DIRECTORY_ADMIN_FOLDER_LABEL} Folder Create"
+CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_ADMIN_FOLDER_LABEL}" "Cimitra Active Directory Integration ${ACTIVE_DIRECTORY_ADMIN_FOLDER_LABEL} App Folder" "$adRootFolderId"
+}
+
+# Get or create the ACTIVE DIRECTORY | DELEGATE folder
+
+$CONFIRM_DELEGATE_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL")
 
 if ( $CONFIRM_DELEGATE_FOLDER ) 
 { 
 Set-Variable -Name ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL -Value $CONFIG$ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL }
 else{
-Set-Variable -Name ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL -Value 'ACTIVE DIRECTORY DELEGATED' 
+Set-Variable -Name ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL -Value 'DELGATE' 
 }
 
 if ((Get-Content "$TEMP_FILE_ONE" | Select-String -CaseSensitive "\b${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL}\b" )){
@@ -710,8 +851,10 @@ Write-Output "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} Folder Exists"
 }else{
 Write-Output ""
 Write-Output "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} Folder Create"
-CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL}" "Cimitra Active Directory Integration ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} App Delegation Folder" "$rootFolderId"
+CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL}" "Cimitra Active Directory Integration ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} App Delegation Folder" "$adRootFolderId"
 }
+
+# Get or create the ACTIVE DIRECTORY | EXCLUDE folder
 
 $CONFIRM_EXCLUDE_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_EXCLUDED_FOLDER_LABEL")
 
@@ -719,7 +862,7 @@ if ( $CONFIRM_EXCLUDE_FOLDER )
 { 
 Set-Variable -Name ACTIVE_DIRECTORY_EXCLUDED_FOLDER_LABEL -Value $CONFIG$ACTIVE_DIRECTORY_EXCLUDED_FOLDER_LABEL }
 else{
-Set-Variable -Name ACTIVE_DIRECTORY_EXCLUDED_FOLDER_LABEL -Value 'ACTIVE DIRECTORY EXCLUDED' 
+Set-Variable -Name ACTIVE_DIRECTORY_EXCLUDED_FOLDER_LABEL -Value 'EXCLUDE' 
 }
 
 if ((Get-Content "$TEMP_FILE_ONE" | Select-String -CaseSensitive "\b${ACTIVE_DIRECTORY_EXCLUDED_FOLDER_LABEL}\b" )){
@@ -728,22 +871,23 @@ Write-Output "${ACTIVE_DIRECTORY_EXCLUDED_FOLDER_LABEL} Folder Exists"
 }else{
 Write-Output ""
 Write-Output "${ACTIVE_DIRECTORY_EXCLUDED_FOLDER_LABEL} Folder Create"
-CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_EXCLUDED_FOLDER_LABEL}" "Cimitra Active Directory Integration Exclude Folder. Any Cimitra Apps placed into this folder will not be recreated in the folder named: ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL}." "$rootFolderId"
+CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_EXCLUDED_FOLDER_LABEL}" "Cimitra Active Directory Integration Exclude Folder. Any Cimitra Apps placed into this folder will not be recreated in the folder named: ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL}." "$adRootFolderId"
 }
 
 
+# Confirm the ACTIVE DIRECTORY | DELEGATE folder
 
-Invoke-RestMethod -Uri $uri/apps/$rootFolderId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
+Invoke-RestMethod -Uri $uri/apps/$adRootFolderId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
 
-if ((Get-Content "$TEMP_FILE_ONE") -match "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL}"){
+if ((Get-Content "$TEMP_FILE_ONE") -match ": ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL}"){
 
-$adFolderIdOne = (Get-Content $TEMP_FILE_ONE | Select-String -SimpleMatch -CaseSensitive "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL}" -Context 1 | Select-Object -First 1 ) 
+$delegateFolderIdOne = (Get-Content $TEMP_FILE_ONE | Select-String -SimpleMatch -CaseSensitive ": ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL}" -Context 1 | Select-Object -First 1 ) 
 
-$adFolderIdTwo = ($adFolderIdOne -split '\n')[0]
+$delegateFolderIdTwo = ($delegateFolderIdOne -split '\n')[0]
 
-$adFolderIdThree = ( $adFolderIdTwo | %{ $_.Split(':')[1];} )
+$delegateFolderIdThree = ( $delegateFolderIdTwo | %{ $_.Split(':')[1];} )
 
-$adFolderId = $adFolderIdThree.Trim()
+$delegateFolderIdId = $delegateFolderIdThree.Trim()
 
 Remove-Item -Path $TEMP_FILE_ONE -Force
 
@@ -753,9 +897,12 @@ Remove-Item -Path $TEMP_FILE_ONE -Force
 exit 1
 }
 
+# Get the ACTIVE DIRECTORY folder children
 
-Invoke-RestMethod -Uri $uri/apps/$adFolderId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
+Invoke-RestMethod -Uri $uri/apps/$delegateFolderIdId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
 
+
+# Confirm/Create the ACTIVE DIRECTORY | DELEGATE | USER MANAGEMENT folder
 
 $CONFIRM_USER_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL")
 
@@ -766,14 +913,16 @@ else{
 Set-Variable -Name ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL -Value 'USER MANAGEMENT' 
 }
 
-if ((Get-Content "$TEMP_FILE_ONE") -match "${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL}"){
+if ((Get-Content "$TEMP_FILE_ONE") -match ": ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL}"){
 Write-Output ""
 Write-Output "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} - Folder Exists"
 }else{
 Write-Output ""
 Write-Output "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} - Folder Create"
-CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL}" "Cimitra Active Directory Integration ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} App Delegation Folder." "$adFolderId"
+CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL}" "Cimitra Active Directory Integration ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} App Delegation Folder." "$delegateFolderIdId"
 }
+
+# Confirm/Create the ACTIVE DIRECTORY | DELEGATE | COMPUTER MANAGEMENT folder
 
 $CONFIRM_COMPUTER_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_COMPUTER_MANAGEMENT_FOLDER_LABEL")
 
@@ -792,11 +941,12 @@ Write-Output ""
 Write-Output ""
 Write-Output "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_COMPUTER_MANAGEMENT_FOLDER_LABEL} - Folder Create"
 Write-Output ""
-CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_COMPUTER_MANAGEMENT_FOLDER_LABEL}" "Cimitra Active Directory Integration ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_COMPUTER_MANAGEMENT_FOLDER_LABEL} App Delegation Folder." "$adFolderId"
+CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_COMPUTER_MANAGEMENT_FOLDER_LABEL}" "Cimitra Active Directory Integration ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_COMPUTER_MANAGEMENT_FOLDER_LABEL} App Delegation Folder." "$delegateFolderIdId"
 }
 
-
+try{
 Remove-Item -Path $TEMP_FILE_ONE -Force
+}catch{}
 
 
 }
@@ -811,9 +961,11 @@ $CONFIG_IO="${PSScriptRoot}\config_reader.ps1"
 
 $settingsFile = "${PSScriptRoot}\settings.cfg"
 
-confirmConfigSetting "$settingsFile" "ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL" "ACTIVE DIRECTORY DELEGATED"
+confirmConfigSetting "$settingsFile" "ACTIVE_DIRECTORY_ADMIN_FOLDER_LABEL" "ADMIN"
 
-confirmConfigSetting "$settingsFile" "ACTIVE_DIRECTORY_EXCLUDED_FOLDER_LABEL" "ACTIVE DIRECTORY EXCLUDED"
+confirmConfigSetting "$settingsFile" "ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL" "DELEGATE"
+
+confirmConfigSetting "$settingsFile" "ACTIVE_DIRECTORY_EXCLUDED_FOLDER_LABEL" "EXCLUDE"
 
 confirmConfigSetting "$settingsFile" "ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL" "USER MANAGEMENT"
 
@@ -871,6 +1023,10 @@ CREATE_CIMITRA_APP "LIST ALL USERS IN AD TREE" "ListUsersDistinguishedNames.ps1"
  
 $jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-firstNameIn `",`"value`":`"`",`"label`":`"First Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Jane`"},{`"param`":`"-lastNameIn `",`"value`":`"`",`"label`":`"Last Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Doe`"},{`"param`":`"-confirmWordIn `",`"value`":`"`",`"label`":`"YES = Confirm`",`"regex`":`"/^[YES]+`$/`",`"placeholder`":`"YES`",`"private`":false}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\RemoveUserAndConfirm.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"REMOVE USER`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_USER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Remove a User From Active Directory`",`"parentFolderId`":`"${adUserFolderId}`"}"
 CREATE_CIMITRA_APP "REMOVE USER" "RemoveUserAndConfirm.ps1" "${adUserFolderId}" "${adExcludeFolderId}" "$jsonFile"
+
+$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-firstNameIn `",`"value`":`"`",`"label`":`"First Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Jane`"},{`"param`":`"-lastNameIn `",`"value`":`"`",`"label`":`"Last Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Doe`"}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\UnlockUser.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"UNLOCK USER ACCOUNT`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_USER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Unlock a user Active Directory account.`",`"parentFolderId`":`"${adUserFolderId}`"}"
+CREATE_CIMITRA_APP "UNLOCK USER ACCOUNT" "UnlockUser.ps1" "${adUserFolderId}" "${adExcludeFolderId}" "$jsonFile"
+
 
 # COMPUTERS #
 
