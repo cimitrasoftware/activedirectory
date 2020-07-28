@@ -113,6 +113,43 @@ if ($contextInSet){
     }
 }
 
+function  Get-DistinguishedName {
+    param (
+        [Parameter(Mandatory,
+        ParameterSetName = 'Input')]
+        [string[]]
+        $CanonicalName,
+
+        [Parameter(Mandatory,
+            ValueFromPipeline,
+            ParameterSetName = 'Pipeline')]
+        [string]
+        $InputObject
+    )
+    process {
+        if ($PSCmdlet.ParameterSetName -eq 'Pipeline') {
+            $arr = $_ -split '/'
+            [array]::reverse($arr)
+            $output = @()
+            $output += $arr[0] -replace '^.*$', '$0'
+            $output += ($arr | select -Skip 1 | select -SkipLast 1) -replace '^.*$', 'OU=$0'
+            $output += ($arr | ? { $_ -like '*.*' }) -split '\.' -replace '^.*$', 'DC=$0'
+            $output -join ','
+        }
+        else {
+            foreach ($cn in $CanonicalName) {
+                $arr = $cn -split '/'
+                [array]::reverse($arr)
+                $output = @()
+                $output += $arr[0] -replace '^.*$', '$0'
+                $output += ($arr | select -Skip 1 | select -SkipLast 1) -replace '^.*$', 'OU=$0'
+                $output += ($arr | ? { $_ -like '*.*' }) -split '\.' -replace '^.*$', 'DC=$0'
+                $output -join ','
+            }
+        }
+    }
+}
+
 
 Write-Output ""
 Write-Output "Following is a list of all of the users."
@@ -120,23 +157,20 @@ Write-Output ""
 Write-Output "------------------------------------------------------"
 Write-Output ""
 
-function reverse
+function LIST_USERS
 { 
 try{
- $array = @(Get-ADUser  -Filter * -SearchBase $context)
+@(Get-ADUser -Filter * -SearchBase $context ) | Get-DistinguishedName
  }catch{
  $err = "$_"
  $global:err = $err
  $global:listUsersResult = $false
  }
 
-  if($listUsersResult){
-  $array
-  }
 
 }
 
-reverse
+LIST_USERS
 
 if ($listUsersResult)
 {
@@ -156,5 +190,3 @@ Write-Output "------------------------------------------------------"
     }
 
 }
-
-
