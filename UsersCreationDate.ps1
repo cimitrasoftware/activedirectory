@@ -11,6 +11,7 @@ $context = "OU=USERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
  # Example: AD_USER_CONTEXT=OU=USERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com
  # -------------------------------------------------
 
+
 $contextInSet = $false
 $setContextInSet = $false
 $verboseOutputSet = $false
@@ -145,19 +146,19 @@ if ($contextInSet){
 }
 
 
-Write-Output ""
+ Write-Output ""
 if(${dayCountIn} -eq 1){
 Write-Output "Users created in the last day"
 }else{
 Write-Output "Users created in the last: ${dayCountIn} days"
 }
-
 Write-Output ""
 Write-Output "--------------------------------------------"
+Write-Output ""
 
 try{
 $When = ((Get-Date).AddDays(-${dayCountIn})).Date
-Get-ADUser -Filter {whenCreated -ge $When} -Properties WhenCreated | select Name, WhenCreated
+Get-ADUser -Filter {whenCreated -ge $When} -Properties WhenCreated | select Name, WhenCreated | fl
 }catch{
 $modifyUserResult = $false
 $err = "$_"
@@ -168,9 +169,11 @@ $err = "$_"
 
 if ($modifyUserResult)
 {
+Write-Output ""
 Write-Output "--------------------------------------------"
 Write-Output ""
 }else{
+Write-Output ""
 Write-Output "--------------------------------------------"
 Write-Output ""
 Write-Output "Error: Unable to determine this information"
