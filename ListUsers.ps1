@@ -155,12 +155,11 @@ Write-Output ""
 Write-Output "Following is a list of all of the users."
 Write-Output ""
 Write-Output "------------------------------------------------------"
-Write-Output ""
 
 function LIST_USERS
 { 
 try{
-@(Get-ADUser -Filter * -SearchBase $context ) | Get-DistinguishedName
+Get-Aduser -Filter * -Searchbase "${context}" | select Name, SamAccountName | fl
  }catch{
  $err = "$_"
  $global:err = $err
@@ -174,7 +173,7 @@ LIST_USERS
 
 if ($listUsersResult)
 {
-Write-Output ""
+
 Write-Output "------------------------------------------------------"
 }else{
 Write-Output "Error: Unable to List Users in Active Directory"
