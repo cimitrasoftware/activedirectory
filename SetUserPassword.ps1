@@ -178,7 +178,7 @@ if ($contextInSet){
 
 # Modify the user
 try{
-Set-ADAccountPassword -Identity "CN=${firstNameIn} ${lastNameIn},$context" -Reset -NewPassword (ConvertTo-SecureString -AsPlainText "passwordIn" -Force)
+Set-ADAccountPassword -Identity "CN=${firstNameIn} ${lastNameIn},$context" -Reset -NewPassword (ConvertTo-SecureString -AsPlainText "$passwordIn" -Force)
 }catch{
 $modifyUserResult = $false
 $err = "$_"
