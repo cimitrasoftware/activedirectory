@@ -117,7 +117,6 @@ if ($contextInSet){
 
 Write-Output ""
 Write-Output "Following is a list of all of the computers, newest to oldest."
-Write-Output ""
 Write-Output "------------------------------------------------------"
 
 
@@ -147,7 +146,6 @@ reverse
 
 if ($listComputersResult)
 {
-Write-Output ""
 Write-Output "------------------------------------------------------"
 }else{
 Write-Output ""

@@ -101,7 +101,6 @@ $context = "OU=DEMOUSERS,DC=cimitrademo,DC=local"
 try{
 Write-Output ""
 Write-Output "Following is a list of all of the users in the AD tree."
-Write-Output ""
 Write-Output "------------------------------------------------------"
 @(Get-ADUser -Filter * ) | Get-DistinguishedName
 $global:actionResult = $true
@@ -112,7 +111,6 @@ $global:err = $err
 }
 
 if($actionResult){
-Write-Output ""
 Write-Output "------------------------------------------------------"
 }else{
 Write-Output "Error: Unable to List Users in Active Directory"

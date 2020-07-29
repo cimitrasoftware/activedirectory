@@ -99,7 +99,6 @@ function  Get-DistinguishedName {
 
 Write-Output ""
 Write-Output "Following is a list of all of the computers in the AD tree."
-Write-Output ""
 Write-Output "-----------------------------------------------------------"
 try{
 @(Get-ADComputer -Filter * ) | Get-DistinguishedName
@@ -112,7 +111,6 @@ $global:actionResult = $false
 
 
 if($actionResult){
-Write-Output ""
 Write-Output "-----------------------------------------------------------"
 }else{
 Write-Output "Error: Unable to List Computers in Active Directory"

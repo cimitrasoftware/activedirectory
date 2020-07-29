@@ -1,4 +1,4 @@
-﻿# Create a New User in Active Directory
+﻿# List Disabled Users in Active Directory
 # Author: Tay Kratzer tay@cimitra.com
 # Change the context variable to match your system
 # -------------------------------------------------
@@ -45,7 +45,7 @@ $context = "$CONFIG$AD_USER_CONTEXT"
 function ShowHelp{
 $scriptName = Split-Path -leaf $PSCommandpath
 Write-Host ""
-Write-Host "List Users in Active Directory"
+Write-Host "List Disabled Users in Active Directory"
 Write-Host ""
 Write-Host "[ HELP ]"
 Write-Host ""
@@ -113,14 +113,16 @@ if ($contextInSet){
     }
 }
 
+
 Write-Output ""
-Write-Output "Following is a list of all of the users."
-Write-Output "---------------------------------------"
+Write-Output "Following is a list of all users whose accounts are disabled."
+Write-Output ""
+Write-Output "-------------------------------------------------------------"
 
 function LIST_USERS
 { 
 try{
-Get-Aduser -Filter * -Searchbase "${context}" | select Name, SamAccountName | fl
+Get-ADUser -Searchbase $context -Filter {(Enabled -eq $False)} | select SamAccountName,Name | fl
  }catch{
  $err = "$_"
  $global:err = $err
@@ -134,11 +136,12 @@ LIST_USERS
 
 if ($listUsersResult)
 {
-Write-Output "---------------------------------------"
+
+Write-Output "-------------------------------------------------------------"
 }else{
-Write-Output "Error: Unable to List Users in Active Directory"
+Write-Output "Error: Unable Generate List in Active Directory"
 Write-Output ""
-Write-Output "------------------------------------------------------"
+Write-Output "-------------------------------------------------------------"
     if ($verboseOutputSet){
     Write-Output "[ERROR MESSAGE BELOW]"
     Write-Output "-----------------------------"

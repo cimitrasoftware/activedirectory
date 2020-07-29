@@ -711,6 +711,169 @@ Remove-Item -Path $TEMP_FILE_ONE -Force
 exit 1
 }
 
+# BLISS
+
+# Get the ACTIVE DIRECTORY | DELGATE | USER MANAGEMENT | USER ACCESS folder
+
+Invoke-RestMethod -Uri $uri/apps/$adUserFolderId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
+
+$CONFIRM_ACCESS_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_USER_ACCESS_FOLDER_LABEL")
+
+if ( $CONFIRM_ACCESS_FOLDER ) 
+{ 
+Set-Variable -Name ACTIVE_DIRECTORY_USER_ACCESS_FOLDER_LABEL -Value $CONFIG$ACTIVE_DIRECTORY_USER_ACCESS_FOLDER_LABEL }
+else{
+Set-Variable -Name ACTIVE_DIRECTORY_USER_ACCESS_FOLDER_LABEL -Value 'USER ACCESS' 
+}
+
+
+if ((Get-Content "$TEMP_FILE_ONE" | Select-String -CaseSensitive "\b${ACTIVE_DIRECTORY_USER_ACCESS_FOLDER_LABEL}\b" )){
+
+$adUserAccessIdOne = (Get-Content $TEMP_FILE_ONE | Select-String -SimpleMatch -CaseSensitive "${ACTIVE_DIRECTORY_USER_ACCESS_FOLDER_LABEL}" -Context 1 | Select-Object -First 1 ) 
+
+$adUserAccessIdTwo = ($adUserAccessIdOne -split '\n')[0]
+
+$adUserAccessIdThree = ( $adUserAccessIdTwo | %{ $_.Split(':')[1];} )
+
+$adUserAccessId = $adUserAccessIdThree.Trim()
+
+$global:adUserAccessId = $adUserAccessId
+
+}else{
+Write-Output "Error: Cannot Create or Discover the Folder: ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_ACCESS_FOLDER_LABEL}"
+Remove-Item -Path $TEMP_FILE_ONE -Force
+exit 1
+}
+
+
+# Get the ACTIVE DIRECTORY | DELGATE | USER MANAGEMENT | USER CHANGES folder
+
+
+$CONFIRM_CHANGES_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_USER_CHANGES_FOLDER_LABEL")
+
+if ( $CONFIRM_CHANGES_FOLDER ) 
+{ 
+Set-Variable -Name ACTIVE_DIRECTORY_USER_CHANGES_FOLDER_LABEL -Value $CONFIG$ACTIVE_DIRECTORY_USER_CHANGES_FOLDER_LABEL }
+else{
+Set-Variable -Name ACTIVE_DIRECTORY_USER_CHANGES_FOLDER_LABEL -Value 'USER CHANGES' 
+}
+
+
+if ((Get-Content "$TEMP_FILE_ONE" | Select-String -CaseSensitive "\b${ACTIVE_DIRECTORY_USER_CHANGES_FOLDER_LABEL}\b" )){
+
+$adUserChangesIdOne = (Get-Content $TEMP_FILE_ONE | Select-String -SimpleMatch -CaseSensitive "${ACTIVE_DIRECTORY_USER_CHANGES_FOLDER_LABEL}" -Context 1 | Select-Object -First 1 ) 
+
+$adUserChangesIdTwo = ($adUserChangesIdOne -split '\n')[0]
+
+$adUserChangesIdThree = ( $adUserChangesIdTwo | %{ $_.Split(':')[1];} )
+
+$adUserChangesId = $adUserChangesIdThree.Trim()
+
+$global:adUserChangesId = $adUserChangesId
+
+}else{
+Write-Output "Error: Cannot Create or Discover the Folder: ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_CHANGES_FOLDER_LABEL}"
+Remove-Item -Path $TEMP_FILE_ONE -Force
+exit 1
+}
+
+
+# Get the ACTIVE DIRECTORY | DELGATE | USER MANAGEMENT | USER REPORTS folder
+
+
+$CONFIRM_REPORTS_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_USER_REPORTS_FOLDER_LABEL")
+
+if ( $CONFIRM_ACCESS_FOLDER ) 
+{ 
+Set-Variable -Name ACTIVE_DIRECTORY_USER_REPORTS_FOLDER_LABEL -Value $CONFIG$ACTIVE_DIRECTORY_USER_REPORTS_FOLDER_LABEL }
+else{
+Set-Variable -Name ACTIVE_DIRECTORY_USER_REPORTS_FOLDER_LABEL -Value 'USER CHANGES' 
+}
+
+
+if ((Get-Content "$TEMP_FILE_ONE" | Select-String -CaseSensitive "\b${ACTIVE_DIRECTORY_USER_REPORTS_FOLDER_LABEL}\b" )){
+
+$adUserReportsIdOne = (Get-Content $TEMP_FILE_ONE | Select-String -SimpleMatch -CaseSensitive "${ACTIVE_DIRECTORY_USER_REPORTS_FOLDER_LABEL}" -Context 1 | Select-Object -First 1 ) 
+
+$adUserReportsIdTwo = ($adUserReportsIdOne -split '\n')[0]
+
+$adUserReportsIdThree = ( $adUserReportsIdTwo | %{ $_.Split(':')[1];} )
+
+$adUserReportsId = $adUserReportsIdThree.Trim()
+
+$global:adUserReportsId = $adUserReportsId
+
+}else{
+Write-Output "Error: Cannot Create or Discover the Folder: ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_REPORTS_FOLDER_LABEL}"
+Remove-Item -Path $TEMP_FILE_ONE -Force
+exit 1
+}
+
+# Get the ACTIVE DIRECTORY | DELGATE | USER MANAGEMENT | CREATE folder
+
+
+$CONFIRM_CREATE_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_USER_CREATE_FOLDER_LABEL")
+
+if ( $CONFIRM_CREATE_FOLDER ) 
+{ 
+Set-Variable -Name ACTIVE_DIRECTORY_USER_CREATE_FOLDER_LABEL -Value $CONFIG$ACTIVE_DIRECTORY_USER_CREATE_FOLDER_LABEL }
+else{
+Set-Variable -Name ACTIVE_DIRECTORY_USER_CREATE_FOLDER_LABEL -Value 'CREATE' 
+}
+
+
+if ((Get-Content "$TEMP_FILE_ONE" | Select-String -CaseSensitive "\b${ACTIVE_DIRECTORY_USER_CREATE_FOLDER_LABEL}\b" )){
+
+$adUserCreateIdOne = (Get-Content $TEMP_FILE_ONE | Select-String -SimpleMatch -CaseSensitive "${ACTIVE_DIRECTORY_USER_CREATE_FOLDER_LABEL}" -Context 1 | Select-Object -First 1 ) 
+
+$adUserCreateIdTwo = ($adUserCreateIdOne -split '\n')[0]
+
+$adUserCreateIdThree = ( $adUserCreateIdTwo | %{ $_.Split(':')[1];} )
+
+$adUserCreateId = $adUserCreateIdThree.Trim()
+
+$global:adUserCreateId = $adUserCreateId
+
+}else{
+Write-Output "Error: Cannot Create or Discover the Folder: ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_CREATE_FOLDER_LABEL}"
+Remove-Item -Path $TEMP_FILE_ONE -Force
+exit 1
+}
+
+# Get the ACTIVE DIRECTORY | DELGATE | USER MANAGEMENT | REMOVE/CHANGE/DELETE folder
+
+
+$CONFIRM_REMOVE_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_USER_REMOVE_CHANGE_DELETE_FOLDER_LABEL")
+
+if ( $CONFIRM_REMOVE_FOLDER ) 
+{ 
+Set-Variable -Name ACTIVE_DIRECTORY_USER_REMOVE_CHANGE_DELETE_FOLDER_LABEL -Value $CONFIG$ACTIVE_DIRECTORY_USER_REMOVE_CHANGE_DELETE_FOLDER_LABEL }
+else{
+Set-Variable -Name ACTIVE_DIRECTORY_USER_REMOVE_CHANGE_DELETE_FOLDER_LABEL -Value 'REMOVE/CHANGE/DELETE' 
+}
+
+
+if ((Get-Content "$TEMP_FILE_ONE" | Select-String -CaseSensitive "\b${ACTIVE_DIRECTORY_USER_REMOVE_CHANGE_DELETE_FOLDER_LABEL}\b" )){
+
+$adUserRemoveIdOne = (Get-Content $TEMP_FILE_ONE | Select-String -SimpleMatch -CaseSensitive "${ACTIVE_DIRECTORY_USER_REMOVE_CHANGE_DELETE_FOLDER_LABEL}" -Context 1 | Select-Object -First 1 ) 
+
+$adUserRemoveIdTwo = ($adUserRemoveIdOne -split '\n')[0]
+
+$adUserRemoveIdThree = ( $adUserRemoveIdTwo | %{ $_.Split(':')[1];} )
+
+$adUserRemoveId = $adUserRemoveIdThree.Trim()
+
+$global:adUserRemoveId = $adUserRemoveId
+
+}else{
+Write-Output "Error: Cannot Create or Discover the Folder: ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_REMOVE_CHANGE_DELETE_FOLDER_LABEL}"
+Remove-Item -Path $TEMP_FILE_ONE -Force
+exit 1
+}
+
+
+Invoke-RestMethod -Uri $uri/apps/$adFolderId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
+
 # Get the ACTIVE DIRECTORY | DELGATE | COMPUTER MANAGEMENT folder
 
 $CONFIRM_COMPUTER_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_COMPUTER_MANAGEMENT_FOLDER_LABEL")
@@ -793,15 +956,8 @@ CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_MAIN_FOLDER}" "Cimitra Active D
 Invoke-RestMethod -Uri $uri/apps/$rootFolderId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
 }
 
-# Write-Output "$TEMP_FILE_ONE"
-
-# Discover the ACTIVE DIRECTORY folder Id
-
-# Write-Output "ACTIVE_DIRECTORY_MAIN_FOLDER = $ACTIVE_DIRECTORY_MAIN_FOLDER"
-
 
 $adRootFolderIdOne = (Get-Content $TEMP_FILE_ONE | Select-String -SimpleMatch -CaseSensitive ": ${ACTIVE_DIRECTORY_MAIN_FOLDER}" -Context 1 | Select-Object -First 1 ) 
-
 
 $adRootFolderIdTwo = ($adRootFolderIdOne -split '\n')[0]
 
@@ -887,7 +1043,7 @@ $delegateFolderIdTwo = ($delegateFolderIdOne -split '\n')[0]
 
 $delegateFolderIdThree = ( $delegateFolderIdTwo | %{ $_.Split(':')[1];} )
 
-$delegateFolderIdId = $delegateFolderIdThree.Trim()
+$delegateFolderId = $delegateFolderIdThree.Trim()
 
 Remove-Item -Path $TEMP_FILE_ONE -Force
 
@@ -899,7 +1055,7 @@ exit 1
 
 # Get the ACTIVE DIRECTORY folder children
 
-Invoke-RestMethod -Uri $uri/apps/$delegateFolderIdId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
+Invoke-RestMethod -Uri $uri/apps/$delegateFolderId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
 
 
 # Confirm/Create the ACTIVE DIRECTORY | DELEGATE | USER MANAGEMENT folder
@@ -919,8 +1075,128 @@ Write-Output "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_US
 }else{
 Write-Output ""
 Write-Output "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} - Folder Create"
-CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL}" "Cimitra Active Directory Integration ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} App Delegation Folder." "$delegateFolderIdId"
+CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL}" "Cimitra Active Directory Integration ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} App Delegation Folder." "$delegateFolderId"
+Invoke-RestMethod -Uri $uri/apps/$delegateFolderId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
 }
+
+# Get USER MANAGEMENT Folder Id
+
+$userManagementFolderIdOne = (Get-Content $TEMP_FILE_ONE | Select-String -SimpleMatch -CaseSensitive ": ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL}" -Context 1 | Select-Object -First 1 ) 
+
+$userManagementFolderIdTwo = ($userManagementFolderIdOne -split '\n')[0]
+
+$userManagementFolderIdThree = ( $userManagementFolderIdTwo | %{ $_.Split(':')[1];} )
+
+$userManagementFolderId = $userManagementFolderIdThree.Trim()
+
+
+# Confirm/Create the ACTIVE DIRECTORY | DELEGATE | USER MANAGEMENT | USER ACCESS folder
+
+$CONFIRM_USER_ACCESS_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_USER_ACCESS_FOLDER_LABEL")
+
+if ( $CONFIRM_USER_ACCESS_FOLDER ) 
+{ 
+Set-Variable -Name ACTIVE_DIRECTORY_USER_ACCESS_FOLDER_LABE-Value $CONFIG$ACTIVE_DIRECTORY_USER_ACCESS_FOLDER_LABEL }
+else{
+Set-Variable -Name ACTIVE_DIRECTORY_USER_ACCESS_FOLDER_LABE -Value 'USER ACCESS' 
+}
+
+if ((Get-Content "$TEMP_FILE_ONE") -match ": ${ACTIVE_DIRECTORY_USER_ACCESS_FOLDER_LABEL}"){
+Write-Output ""
+Write-Output "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_ACCESS_FOLDER_LABEL} - Folder Exists"
+}else{
+Write-Output ""
+Write-Output "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_ACCESS_FOLDER_LABEL} - Folder Create"
+CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_USER_ACCESS_FOLDER_LABEL}" "Cimitra Active Directory Integration ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_ACCESS_FOLDER_LABEL} App Delegation Folder." "$userManagementFolderId"
+}
+
+
+
+# Confirm/Create the ACTIVE DIRECTORY | DELEGATE | USER MANAGEMENT | USER CHANGES folder
+
+$CONFIRM_USER_CHANGES_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_USER_CHANGES_FOLDER_LABEL")
+
+if ( $CONFIRM_USER_CHANGES_FOLDER ) 
+{ 
+Set-Variable -Name ACTIVE_DIRECTORY_USER_CHANGES_FOLDER_LABE-Value $CONFIG$ACTIVE_DIRECTORY_USER_CHANGES_FOLDER_LABEL }
+else{
+Set-Variable -Name ACTIVE_DIRECTORY_USER_CHANGES_FOLDER_LABE -Value 'USER CHANGES' 
+}
+
+if ((Get-Content "$TEMP_FILE_ONE") -match ": ${ACTIVE_DIRECTORY_USER_CHANGES_FOLDER_LABEL}"){
+Write-Output ""
+Write-Output "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_CHANGES_FOLDER_LABEL} - Folder Exists"
+}else{
+Write-Output ""
+Write-Output "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_CHANGES_FOLDER_LABEL} - Folder Create"
+CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_USER_CHANGES_FOLDER_LABEL}" "Cimitra Active Directory Integration ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_CHANGES_FOLDER_LABEL} App Delegation Folder." "$userManagementFolderId"
+}
+
+# Confirm/Create the ACTIVE DIRECTORY | DELEGATE | USER MANAGEMENT | USER REPORTS folder
+
+$CONFIRM_USER_REPORTS_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_USER_REPORTS_FOLDER_LABEL")
+
+if ( $CONFIRM_USER_REPORTS_FOLDER ) 
+{ 
+Set-Variable -Name ACTIVE_DIRECTORY_USER_REPORTS_FOLDER_LABEL -Value $CONFIG$ACTIVE_DIRECTORY_USER_REPORTS_FOLDER_LABEL }
+else{
+Set-Variable -Name ACTIVE_DIRECTORY_USER_REPORTS_FOLDER_LABEL -Value 'USER REPORTS' 
+}
+
+if ((Get-Content "$TEMP_FILE_ONE") -match ": ${ACTIVE_DIRECTORY_USER_REPORTS_FOLDER_LABEL}"){
+Write-Output ""
+Write-Output "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_REPORTS_FOLDER_LABEL} - Folder Exists"
+}else{
+Write-Output ""
+Write-Output "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_REPORTS_FOLDER_LABEL} - Folder Create"
+CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_USER_REPORTS_FOLDER_LABEL}" "Cimitra Active Directory Integration ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_REPORTS_FOLDER_LABEL} App Delegation Folder." "$userManagementFolderId"
+}
+
+# Confirm/Create the ACTIVE DIRECTORY | DELEGATE | USER MANAGEMENT | CREATE folder
+
+$CONFIRM_USER_CREATE_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_USER_CREATE_FOLDER_LABEL")
+
+if ( $CONFIRM_USER_CREATE_FOLDER ) 
+{ 
+Set-Variable -Name ACTIVE_DIRECTORY_USER_CREATE_FOLDER_LABEL -Value $CONFIG$ACTIVE_DIRECTORY_USER_CREATE_FOLDER_LABEL }
+else{
+Set-Variable -Name ACTIVE_DIRECTORY_USER_CREATE_FOLDER_LABEL -Value 'USER CREATE' 
+}
+
+if ((Get-Content "$TEMP_FILE_ONE") -match ": ${ACTIVE_DIRECTORY_USER_CREATE_FOLDER_LABEL}"){
+Write-Output ""
+Write-Output "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_CREATE_FOLDER_LABEL} - Folder Exists"
+}else{
+Write-Output ""
+Write-Output "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_CREATE_FOLDER_LABEL} - Folder Create"
+CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_USER_CREATE_FOLDER_LABEL}" "Cimitra Active Directory Integration ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_CREATE_FOLDER_LABEL} App Delegation Folder." "$userManagementFolderId"
+}
+
+
+$CONFIRM_USER_REMOVE_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_USER_REMOVE_CHANGE_DELETE_FOLDER_LABEL")
+
+if ( $CONFIRM_USER_CREATE_FOLDER ) 
+{ 
+Set-Variable -Name ACTIVE_DIRECTORY_USER_REMOVE_CHANGE_DELETE_FOLDER_LABEL -Value $CONFIG$ACTIVE_DIRECTORY_USER_REMOVE_CHANGE_DELETE_FOLDER_LABEL }
+else{
+Set-Variable -Name ACTIVE_DIRECTORY_USER_REMOVE_CHANGE_DELETE_FOLDER_LABEL -Value 'REMOVE/CHANGE/DELETE' 
+}
+
+if ((Get-Content "$TEMP_FILE_ONE") -match ": ${ACTIVE_DIRECTORY_USER_REMOVE_CHANGE_DELETE_FOLDER_LABEL}"){
+Write-Output ""
+Write-Output "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_REMOVE_CHANGE_DELETE_FOLDER_LABEL} - Folder Exists"
+}else{
+Write-Output ""
+Write-Output "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_REMOVE_CHANGE_DELETE_FOLDER_LABEL} - Folder Create"
+CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_USER_REMOVE_CHANGE_DELETE_FOLDER_LABEL}" "Cimitra Active Directory Integration ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_REMOVE_CHANGE_DELETE_FOLDER_LABEL} App Delegation Folder." "$userManagementFolderId"
+}
+
+
+
+
+# BLISS
+
+Invoke-RestMethod -Uri $uri/apps/$delegateFolderId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
 
 # Confirm/Create the ACTIVE DIRECTORY | DELEGATE | COMPUTER MANAGEMENT folder
 
@@ -941,7 +1217,7 @@ Write-Output ""
 Write-Output ""
 Write-Output "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_COMPUTER_MANAGEMENT_FOLDER_LABEL} - Folder Create"
 Write-Output ""
-CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_COMPUTER_MANAGEMENT_FOLDER_LABEL}" "Cimitra Active Directory Integration ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_COMPUTER_MANAGEMENT_FOLDER_LABEL} App Delegation Folder." "$delegateFolderIdId"
+CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_COMPUTER_MANAGEMENT_FOLDER_LABEL}" "Cimitra Active Directory Integration ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_COMPUTER_MANAGEMENT_FOLDER_LABEL} App Delegation Folder." "$delegateFolderId"
 }
 
 try{
@@ -968,6 +1244,16 @@ confirmConfigSetting "$settingsFile" "ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL" "
 confirmConfigSetting "$settingsFile" "ACTIVE_DIRECTORY_EXCLUDED_FOLDER_LABEL" "EXCLUDE"
 
 confirmConfigSetting "$settingsFile" "ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL" "USER MANAGEMENT"
+
+confirmConfigSetting "$settingsFile" "ACTIVE_DIRECTORY_USER_ACCESS_FOLDER_LABEL" "USER ACCESS"
+
+confirmConfigSetting "$settingsFile" "ACTIVE_DIRECTORY_USER_CHANGES_FOLDER_LABEL" "USER CHANGES"
+
+confirmConfigSetting "$settingsFile" "ACTIVE_DIRECTORY_USER_REPORTS_FOLDER_LABEL" "USER REPORTS"
+
+confirmConfigSetting "$settingsFile" "ACTIVE_DIRECTORY_USER_CREATE_FOLDER_LABEL" "CREATE"
+
+confirmConfigSetting "$settingsFile" "ACTIVE_DIRECTORY_USER_REMOVE_CHANGE_DELETE_FOLDER_LABEL" "REMOVE/CHANGE/DELETE"
 
 confirmConfigSetting "$settingsFile" "ACTIVE_DIRECTORY_COMPUTER_MANAGEMENT_FOLDER_LABEL" "COMPUTER MANAGEMENT"
 
@@ -1002,31 +1288,54 @@ GET_FOLDER_IDS
 $scriptRoot = Write-Output "${PSScriptRoot}" | % {$_ -replace '\\','\\'}
 
 # USERS #
+# Make LIST USERS App
+$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\ListUsers.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"LIST USERS`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_USER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"List Computers in an Active Directory Context`",`"parentFolderId`":`"${adUserCreateId}`"}"
+CREATE_CIMITRA_APP "LIST USERS" "ListUsers.ps1" "${adUserCreateId}" "${adExcludeFolderId}" "$jsonFile"
 
 # Make CREATE USER App
-$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-firstNameIn `",`"value`":`"`",`"label`":`"First Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Jane`"},{`"param`":`"-lastNameIn `",`"value`":`"`",`"label`":`"Last Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Doe`"},{`"param`":`"-passwordIn `",`"value`":`"`",`"label`":`"Password`",`"regex`":`"/^[0-9A-Za-z_+-=]+`$/`",`"placeholder`":`"p433w0r9_ch4ng3`",`"private`":true}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\NewUser.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"CREATE USER`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_USER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Create a User in Active Directory`",`"parentFolderId`":`"${adUserFolderId}`"}"
-CREATE_CIMITRA_APP "CREATE USER" "NewUser.ps1" "${adUserFolderId}" "${adExcludeFolderId}" "$jsonFile"
+$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-firstNameIn `",`"value`":`"`",`"label`":`"First Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Jane`"},{`"param`":`"-lastNameIn `",`"value`":`"`",`"label`":`"Last Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Doe`"},{`"param`":`"-passwordIn `",`"value`":`"`",`"label`":`"Password`",`"regex`":`"/^[0-9A-Za-z_+-=]+`$/`",`"placeholder`":`"p433w0r9_ch4ng3`",`"private`":true}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\NewUser.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"CREATE USER`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_USER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Create a User in Active Directory`",`"parentFolderId`":`"${adUserCreateId}`"}"
+CREATE_CIMITRA_APP "CREATE USER" "NewUser.ps1" "${adUserCreateId}" "${adExcludeFolderId}" "$jsonFile"
 
-# Make LIST USERS App
-$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\ListUsers.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"LIST USERS`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_USER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"List Computers in an Active Directory Context`",`"parentFolderId`":`"${adUserFolderId}`"}"
-CREATE_CIMITRA_APP "LIST USERS" "ListUsers.ps1" "${adUserFolderId}" "${adExcludeFolderId}" "$jsonFile"
+$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-dayCountIn `",`"value`":`"`",`"label`":`"NUMBER OF DAYS AGO`",`"regex`":`"/^[0-9A]+`$/`",`"placeholder`":`"7`"}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\UsersCreationDate.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"RECENTLY CREATED USERS`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_USER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Report Users Created Recently.`",`"parentFolderId`":`"${adUserCreateId}`"}"
+CREATE_CIMITRA_APP "RECENTLY CREATED USERS" "UsersCreationDate.ps1" "${adUserCreateId}" "${adExcludeFolderId}" "$jsonFile"
 
-$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-firstNameIn `",`"value`":`"`",`"label`":`"First Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Jane`"},{`"param`":`"-lastNameIn `",`"value`":`"`",`"label`":`"Last Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Doe`"},{`"param`":`"-passwordIn `",`"value`":`"`",`"label`":`"Password`",`"regex`":`"/^[0-9A-Za-z_+-=]+`$/`",`"placeholder`":`"p433w0r9_ch4ng3`",`"private`":true}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\SetUserPassword.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"CHANGE USER PASSWORD`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_USER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Change a User Password in Active Directory`",`"parentFolderId`":`"${adUserFolderId}`"}"
-CREATE_CIMITRA_APP "CHANGE USER PASSWORD" "SetUserPassword.ps1" "${adUserFolderId}" "${adExcludeFolderId}" "$jsonFile"
+$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-firstNameIn `",`"value`":`"`",`"label`":`"First Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Jane`"},{`"param`":`"-lastNameIn `",`"value`":`"`",`"label`":`"Last Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Doe`"},{`"param`":`"-passwordIn `",`"value`":`"`",`"label`":`"Password`",`"regex`":`"/^[0-9A-Za-z_+-=]+`$/`",`"placeholder`":`"p433w0r9_ch4ng3`",`"private`":true}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\SetUserPassword.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"CHANGE USER PASSWORD`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_USER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Change a User Password in Active Directory`",`"parentFolderId`":`"${adUserAccessId}`"}"
+CREATE_CIMITRA_APP "CHANGE USER PASSWORD" "SetUserPassword.ps1" "${adUserAccessId}" "${adExcludeFolderId}" "$jsonFile"
 
-$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-firstNameIn `",`"value`":`"`",`"label`":`"First Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Jane`"},{`"param`":`"-lastNameIn `",`"value`":`"`",`"label`":`"Last Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Doe`"}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\CheckPasswordSetDate.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"CHECK PASSWORD CHANGE DATE`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_USER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Check When a User Password Was Last Changed in Active Directory`",`"parentFolderId`":`"${adUserFolderId}`"}"
-CREATE_CIMITRA_APP "CHECK PASSWORD CHANGE DATE" "CheckPasswordSetDate.ps1" "${adUserFolderId}" "${adExcludeFolderId}" "$jsonFile"
+$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-firstNameIn `",`"value`":`"`",`"label`":`"First Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Jane`"},{`"param`":`"-lastNameIn `",`"value`":`"`",`"label`":`"Last Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Doe`"}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\CheckPasswordSetDate.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"CHECK PASSWORD CHANGE DATE`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_USER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Check When a User Password Was Last Changed in Active Directory`",`"parentFolderId`":`"${adUserAccessId}`"}"
+CREATE_CIMITRA_APP "CHECK PASSWORD CHANGE DATE" "CheckPasswordSetDate.ps1" "${adUserAccessId}" "${adExcludeFolderId}" "$jsonFile"
 
 # Make LIST ALL USERS IN AD TREE App
-$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\ListUsersDistinguishedNames.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"LIST ALL USERS IN AD TREE`",`"notes`":`" `",`"description`":`"List All Users in an Entire Active Directory Tree`",`"parentFolderId`":`"${adUserFolderId}`"}"
-CREATE_CIMITRA_APP "LIST ALL USERS IN AD TREE" "ListUsersDistinguishedNames.ps1" "${adUserFolderId}" "${adExcludeFolderId}" "$jsonFile"
+$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\ListUsersDistinguishedNames.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"LIST ALL USERS IN AD TREE`",`"notes`":`" `",`"description`":`"List All Users in an Entire Active Directory Tree`",`"parentFolderId`":`"${adUserReportsId}`"}"
+CREATE_CIMITRA_APP "LIST ALL USERS IN AD TREE" "ListUsersDistinguishedNames.ps1" "${adUserReportsId}" "${adExcludeFolderId}" "$jsonFile"
  
-$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-firstNameIn `",`"value`":`"`",`"label`":`"First Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Jane`"},{`"param`":`"-lastNameIn `",`"value`":`"`",`"label`":`"Last Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Doe`"},{`"param`":`"-confirmWordIn `",`"value`":`"`",`"label`":`"YES = Confirm`",`"regex`":`"/^[YES]+`$/`",`"placeholder`":`"YES`",`"private`":false}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\RemoveUserAndConfirm.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"REMOVE USER`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_USER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Remove a User From Active Directory`",`"parentFolderId`":`"${adUserFolderId}`"}"
-CREATE_CIMITRA_APP "REMOVE USER" "RemoveUserAndConfirm.ps1" "${adUserFolderId}" "${adExcludeFolderId}" "$jsonFile"
+$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-firstNameIn `",`"value`":`"`",`"label`":`"First Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Jane`"},{`"param`":`"-lastNameIn `",`"value`":`"`",`"label`":`"Last Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Doe`"},{`"param`":`"-confirmWordIn `",`"value`":`"`",`"label`":`"YES = Confirm`",`"regex`":`"/^[YES]+`$/`",`"placeholder`":`"YES`",`"private`":false}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\RemoveUserAndConfirm.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"REMOVE USER`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_USER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Remove a User From Active Directory`",`"parentFolderId`":`"${adUserRemoveId}`"}"
+CREATE_CIMITRA_APP "REMOVE USER" "RemoveUserAndConfirm.ps1" "${adUserRemoveId}" "${adExcludeFolderId}" "$jsonFile"
 
-$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-firstNameIn `",`"value`":`"`",`"label`":`"First Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Jane`"},{`"param`":`"-lastNameIn `",`"value`":`"`",`"label`":`"Last Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Doe`"}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\UnlockUser.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"UNLOCK USER ACCOUNT`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_USER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Unlock a user Active Directory account.`",`"parentFolderId`":`"${adUserFolderId}`"}"
-CREATE_CIMITRA_APP "UNLOCK USER ACCOUNT" "UnlockUser.ps1" "${adUserFolderId}" "${adExcludeFolderId}" "$jsonFile"
+$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-firstNameIn `",`"value`":`"`",`"label`":`"First Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Jane`"},{`"param`":`"-lastNameIn `",`"value`":`"`",`"label`":`"Last Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Doe`"}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\UnlockUser.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"UNLOCK USER ACCOUNT`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_USER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Unlock a user Active Directory account.`",`"parentFolderId`":`"${adUserAccessId}`"}"
+CREATE_CIMITRA_APP "UNLOCK USER ACCOUNT" "UnlockUser.ps1" "${adUserAccessId}" "${adExcludeFolderId}" "$jsonFile"
 
+$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\ListUsersExpired.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"LIST EXPIRED USERS`",`"notes`":`" `",`"description`":`"List All User Accounts Currently Expired`",`"parentFolderId`":`"${adUserAccessId}`"}"
+CREATE_CIMITRA_APP "LIST EXPIRED USERS" "ListUsersExpired.ps1" "${adUserAccessId}" "${adExcludeFolderId}" "$jsonFile"
+ 
+$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-firstNameIn `",`"value`":`"`",`"label`":`"First Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Jane`"},{`"param`":`"-lastNameIn `",`"value`":`"`",`"label`":`"Last Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Doe`"},{`"param`":`"-expireDateIn `",`"value`":`"`",`"label`":`"Expire Date - Syntax: 2/2/2022`",`"regex`":`"/^[0-9\/]+$/`",`"placeholder`":`"2/2/2022`",`"private`":false}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\SetUserExpireDate.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"SET ACCOUNT EXPIRE DATE`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_USER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Set User Account Expire Date in Active Directory`",`"parentFolderId`":`"${adUserAccessId}`"}"
+CREATE_CIMITRA_APP "SET ACCOUNT EXPIRE DATE" "SetUserExpireDate.ps1" "${adUserAccessId}" "${adExcludeFolderId}" "$jsonFile"
+
+$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-firstNameIn `",`"value`":`"`",`"label`":`"First Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Jane`"},{`"param`":`"-lastNameIn `",`"value`":`"`",`"label`":`"Last Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Doe`"}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\RemoveUserExpireDate.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"REMOVE ACCOUNT EXPIRE DATE`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_USER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Remove a User Account Expire Date.`",`"parentFolderId`":`"${adUserAccessId}`"}"
+CREATE_CIMITRA_APP "REMOVE ACCOUNT EXPIRE DATE" "RemoveUserExpireDate.ps1" "${adUserAccessId}" "${adExcludeFolderId}" "$jsonFile"
+
+$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\ListUsersWithExpireDate.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"LIST USERS WITH EXPIRE DATE`",`"notes`":`" `",`"description`":`"List All Users Who Have an Expire Date in Active Directory`",`"parentFolderId`":`"${adUserAccessId}`"}"
+CREATE_CIMITRA_APP "LIST USERS WITH EXPIRE DATE" "ListUsersWithExpireDate.ps1" "${adUserAccessId}" "${adExcludeFolderId}" "$jsonFile"
+ 
+$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-firstNameIn `",`"value`":`"`",`"label`":`"First Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Jane`"},{`"param`":`"-lastNameIn `",`"value`":`"`",`"label`":`"Last Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Doe`"}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\DisableUserAccount.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"DISABLE USER ACCOUNT`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_USER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Disable a User Active Directory account.`",`"parentFolderId`":`"${adUserAccessId}`"}"
+CREATE_CIMITRA_APP "DISABLE USER ACCOUNT" "DisableUserAccount.ps1" "${adUserAccessId}" "${adExcludeFolderId}" "$jsonFile"
+
+$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-firstNameIn `",`"value`":`"`",`"label`":`"First Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Jane`"},{`"param`":`"-lastNameIn `",`"value`":`"`",`"label`":`"Last Name`",`"regex`":`"/^[0-9A-Za-z_+-= ]+`$/`",`"placeholder`":`"Doe`"}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\EnableUserAccount.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"ENABLE USER ACCOUNT`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_USER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Enable a User Active Directory account.`",`"parentFolderId`":`"${adUserAccessId}`"}"
+CREATE_CIMITRA_APP "ENABLE USER ACCOUNT" "EnableUserAccount.ps1" "${adUserAccessId}" "${adExcludeFolderId}" "$jsonFile"
+
+$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\ListUsersDisabled.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"LIST DISABLED ACCOUNTS`",`"notes`":`" `",`"description`":`"List Disabled User Accounts in Active Directory`",`"parentFolderId`":`"${adUserAccessId}`"}"
+CREATE_CIMITRA_APP "LIST DISABLED ACCOUNTS" "ListUsersDisabled.ps1" "${adUserAccessId}" "${adExcludeFolderId}" "$jsonFile"
+ 
 
 # COMPUTERS #
 
@@ -1045,6 +1354,20 @@ CREATE_CIMITRA_APP "LIST ALL COMPUTERS IN AD TREE" "ListComputersDistinguishedNa
 
 $jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-computerNameIn `",`"value`":`"`",`"label`":`"Computer Name`",`"regex`":`"/^[0-9A-Za-z_+-=]+`$/`",`"placeholder`":`"WIN_COMPUTER_ONE`"}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\RemoveComputer.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"REMOVE COMPUTER`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_COMPUTER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Remove a Computer From Active Directory`",`"parentFolderId`":`"${adComputerFolderId}`"}"
 CREATE_CIMITRA_APP "REMOVE COMPUTER" "RemoveComputer.ps1" "${adComputerFolderId}" "${adExcludeFolderId}" "$jsonFile"
+
+# $adUserFolderId
+
+# $adComputerFolderId
+
+# $adUserAccessId
+
+# $adUserChangesId
+
+# $adUserReportsId
+
+# $adUserRemoveId
+
+# $adUserCreateId
 
 
 write-output "------------------------------------------------"

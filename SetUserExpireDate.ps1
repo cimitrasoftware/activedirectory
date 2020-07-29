@@ -1,4 +1,4 @@
-﻿# Create a New User in Active Directory
+﻿# Set User's Expire Date in Active Directory
 # Author: Tay Kratzer tay@cimitra.com
 # Change the context variable to match your system
 # -------------------------------------------------
@@ -15,45 +15,35 @@ $passwordInSet = $false
 $contextInSet = $false
 $setContextInSet = $false
 $verboseOutputSet = $false
-$global:forcePasswordResetSet = $false
-$createUserResult = $true
+$modifyUserResult = $true
 $sleepTime = 5
 
-# Get the First Name variable passed in
+
+
 $firstNameIn = ([Regex]'(?is)(?:(?<=\-firstNameIn).+(?=-lastNameIn))').Match(($args -join "`n")).Value 
-# Clean up the input
+
 $firstNameIn = [string]::join(" ",($firstNameIn.Split("`n"))).Trim()
-# Get change to title case if the culture dictates
+
 $firstNameIn = (Get-Culture).TextInfo.ToTitleCase($firstNameIn) 
 
-# Get the Last Name variable passed in
-$lastNameIn = ([Regex]'(?is)(?:(?<=\-lastNameIn).+(?=-passwordIn))').Match(($args -join "`n")).Value 
+$lastNameIn = ([Regex]'(?is)(?:(?<=\-lastNameIn).+(?=-expireDateIn))').Match(($args -join "`n")).Value 
 
 $lastNameIn = [string]::join(" ",($lastNameIn.Split("`n"))).Trim() 
 
 $lastNameIn = (Get-Culture).TextInfo.ToTitleCase($lastNameIn) 
 
-# Get the Password variable passed in
-Write-Output $args | Select-String '-passwordIn' -Context 0,1 | ForEach-Object {
-$passwordIn = $_.Context.PostContext.Trim() 
+Write-Output $args | Select-String '-expireDateIn' -Context 0,1 | ForEach-Object {
+$expireDateIn = $_.Context.PostContext.Trim() 
 }
 
-# Get the Context variable if it was passed in
 if(Write-Output $args | Select-String '-contextIn'){
 $theArgs = $MyInvocation.Line
 $contextIn = $theArgs  -split "(?<=-contextIn)\s" | Select -Skip 1 -First 1
 }
 
-# See if the -showErrors variable was passed in
 if (Write-Output "$args" | Select-String -CaseSensitive "-showErrors" ){
 $verboseOutputSet = $true
 }
-
-# See if the -showErrors variable was passed in
-if (Write-Output "$args" | Select-String -CaseSensitive "-forcePasswordReset" ){
-$global:forcePasswordResetSet = $true
-}
-
 
 if($firstNameIn.Length -gt 2){
 $firstNameInSet = $true
@@ -63,8 +53,8 @@ if($lastNameIn.Length -gt 2){
 $lastNameInSet = $true
 }
 
-if($passwordIn.Length -gt 2){
-$passwordInSet = $true
+if($expireDateIn.Length -gt 2){
+$expireDateInSet = $true
 }
 
 if($contextIn.Length -gt 2){
@@ -110,7 +100,7 @@ Start-Sleep -s $sleepTime
 function ShowHelp{
 $scriptName = Split-Path -leaf $PSCommandpath
 Write-Host ""
-Write-Host "Create User in Active Directory"
+Write-Host "Set a User's Expire Date in Active Directory"
 Write-Host ""
 Write-Host "[ HELP ]"
 Write-Host ""
@@ -118,31 +108,29 @@ Write-Host ".\$scriptName -h or -help"
 Write-Host ""
 Write-Host "[ SCRIPT USAGE ]"
 Write-Host ""
-Write-Host ".\$scriptName -firstNameIn <user first name> -lastNameIn <user last name> -passwordIn <password> -contextIn <Active Directory context (optional if specified in settings.cfg)>"
+Write-Host ".\$scriptName -firstNameIn <user first name> -lastNameIn <user last name> -expireDateIn <expire date> -contextIn <Active Directory context (optional if specified in settings.cfg)>"
+Write-Host ""
+Write-Host "-OR-"
+Write-Host ""
+Write-Host ".\$scriptName -setContext <Active Directory context (optional if specified in settings.cfg)> -firstNameIn <user first name> -lastNameIn <user last name> -expireDateIn <expire date>"
 Write-Host ""
 Write-Host "[ EXAMPLES ]"
 Write-Host ""
-Write-Host "Example: .\$scriptName -firstNameIn Jane -lastNameIn Doe -passwordIn p433w0r9_ch4ng3"
+Write-Host "Example: .\$scriptName -firstNameIn Jane -lastNameIn Doe -expireDateIn 2/2/2022"
 Write-Host ""
 Write-Host "-OR-"
 Write-Host ""
-Write-Host "Example: .\$scriptName -setContext OU=USERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com -firstNameIn Jane -lastNameIn Doe -passwordIn p433w0r9_ch4ng3"
+Write-Host "Example: .\$scriptName -setContext OU=USERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com -firstNameIn Jane -lastNameIn Doe -expireDateIn 2/2/2022"
 Write-Host ""
 Write-Host "-OR-"
 Write-Host ""
-Write-Host "Example: .\$scriptName -firstNameIn Jane -lastNameIn Doe -passwordIn p433w0r9_ch4ng3 -contextIn OU=USERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
+Write-Host "Example: .\$scriptName -firstNameIn Jane -lastNameIn Doe -expireDateIn 2/2/2022 -contextIn OU=USERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
 Write-Host ""
 Write-Host "[ ERROR HANDLING ]"
 Write-Host ""
 Write-Host "-showErrors = Show Error Messages"
 Write-Host ""
-Write-Host "Example: .\$scriptName -showErrors -firstNameIn Jane -lastNameIn Doe -passwordIn p433w0r9_ch4ng3 -contextIn OU=USERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
-Write-Host ""
-Write-Host "[ PREFERENCES ]"
-Write-Host ""
-Write-Host "-forcePasswordReset = Force a Password Reset on Next User Login"
-Write-Host ""
-Write-Host "Example: .\$scriptName -forcePasswordReset -firstNameIn Jane -lastNameIn Doe -passwordIn p433w0r9_ch4ng3"
+Write-Host "Example: .\$scriptName -showErrors -firstNameIn Jane -lastNameIn Doe -expireDateIn 2/2/2022"
 Write-Host ""
 exit 0
 }
@@ -154,7 +142,7 @@ ShowHelp
 
 
 # This script expects 3 arguments, so if the 3rd argument is blank, then show the Help and exit
-if (!( $firstNameInSet -and $lastNameInSet -and $passwordInSet )){ 
+if (!( $firstNameInSet -and $lastNameInSet -and $expireDateInSet )){ 
 ShowHelp
  }
 # -------------------------------------------------
@@ -171,6 +159,7 @@ if($setContextIn.Length -gt 2){
 $setContextInSet = $true
 }
 
+
 if ($contextInSet){ 
     $context = $contextIn
     Write-Output ""
@@ -181,29 +170,25 @@ if ($contextInSet){
     }
 }
 
-# Make the samAccountName variable from a combination of the user's first and last name
-$samAccountName = ($firstNameIn+$lastNameIn).ToLower()
 
-# Create the new user
+# Modify the user
 try{
-
-New-ADUser -Name "$firstNameIn $lastNameIn" -GivenName "$firstNameIn" -Surname "$lastNameIn" -SamAccountName "$samAccountName" -AccountPassword (ConvertTo-SecureString "$passwordIn" -AsPlainText -force) -passThru -path "$context" 
-
+Set-ADUser -Identity "CN=${firstNameIn} ${lastNameIn},$context" -AccountExpirationDate "$expireDateIn"
 }catch{
-$createUserResult = $false
+$modifyUserResult = $false
 $err = "$_"
 }
 
 
 # If exit code from the New-ADUser command was "True" then show a success message
-if ($createUserResult)
+if ($modifyUserResult)
 {
 Write-Output ""
-Write-Output "New User: ${firstNameIn} ${lastNameIn} created in Active Directory"
+Write-Output "User: ${firstNameIn} ${lastNameIn} expire date changed to: ${expireDateIn} in Active Directory"
 Write-Output ""
 }else{
 Write-Output ""
-Write-Output "User: ( ${firstNameIn} ${lastNameIn} ) was NOT created in Active Directory"
+Write-Output "User: ${firstNameIn} ${lastNameIn} expire date NOT changed in Active Directory"
 Write-Output ""
     if ($verboseOutputSet){
     Write-Output "[ERROR MESSAGE BELOW]"
@@ -214,20 +199,5 @@ Write-Output ""
     Write-Output "-----------------------------"
     }
 exit 1
-}
-
-CALL_SLEEP
-# Enable the account
-Enable-ADAccount -Identity "CN=$firstNameIn $lastNameIn,$context" -Confirm:$False
-
-
-if($forcePasswordResetSet){
- CALL_SLEEP
-# Force an immediate password reset
- Set-ADUser -Identity  "CN=$firstNameIn $lastNameIn,$context" -ChangePasswordAtLogon $true
- Write-Output ""
- Write-Output "NOTE: This user will be required to change their password the next time they log in."
- Write-Output ""
-
 }
 

@@ -1,4 +1,4 @@
-﻿# Create a New User in Active Directory
+﻿# List Users with Expire Date in Active Directory
 # Author: Tay Kratzer tay@cimitra.com
 # Change the context variable to match your system
 # -------------------------------------------------
@@ -45,7 +45,7 @@ $context = "$CONFIG$AD_USER_CONTEXT"
 function ShowHelp{
 $scriptName = Split-Path -leaf $PSCommandpath
 Write-Host ""
-Write-Host "List Users in Active Directory"
+Write-Host "List Users With Expire Date in Active Directory"
 Write-Host ""
 Write-Host "[ HELP ]"
 Write-Host ""
@@ -113,19 +113,23 @@ if ($contextInSet){
     }
 }
 
+
 Write-Output ""
-Write-Output "Following is a list of all of the users."
-Write-Output "---------------------------------------"
+Write-Output "Accounts with an Expiration Date in Active Directory."
+Write-Output "-----------------------------------------------------"
 
 function LIST_USERS
 { 
 try{
-Get-Aduser -Filter * -Searchbase "${context}" | select Name, SamAccountName | fl
+Get-Aduser -SearchBase $context -Filter "AccountExpirationDate -ne '*'" -Properties AccountExpirationDate | select Name, AccountExpirationDate | fl
+
  }catch{
  $err = "$_"
  $global:err = $err
  $global:listUsersResult = $false
  }
+
+
 
 
 }
@@ -134,11 +138,12 @@ LIST_USERS
 
 if ($listUsersResult)
 {
-Write-Output "---------------------------------------"
+
+Write-Output "-----------------------------------------------------"
 }else{
-Write-Output "Error: Unable to List Users in Active Directory"
+Write-Output "Error: Unable Generate List in Active Directory"
 Write-Output ""
-Write-Output "------------------------------------------------------"
+Write-Output "-----------------------------------------------------"
     if ($verboseOutputSet){
     Write-Output "[ERROR MESSAGE BELOW]"
     Write-Output "-----------------------------"

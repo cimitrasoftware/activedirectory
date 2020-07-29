@@ -113,14 +113,16 @@ if ($contextInSet){
     }
 }
 
+
 Write-Output ""
-Write-Output "Following is a list of all of the users."
-Write-Output "---------------------------------------"
+Write-Output "Following is a list of all users who have never logged in."
+Write-Output ""
+Write-Output "----------------------------------------------------------"
 
 function LIST_USERS
 { 
 try{
-Get-Aduser -Filter * -Searchbase "${context}" | select Name, SamAccountName | fl
+get-aduser -SearchBase "${context}" -Filter {-not (lastlogontimestamp -like "*") -and -not (iscriticalsystemobject -eq $true)}  | select Name, SamAccountName | fl
  }catch{
  $err = "$_"
  $global:err = $err
@@ -134,11 +136,12 @@ LIST_USERS
 
 if ($listUsersResult)
 {
-Write-Output "---------------------------------------"
+
+Write-Output "----------------------------------------------------------"
 }else{
-Write-Output "Error: Unable to List Users in Active Directory"
+Write-Output "Error: Unable Generate List in Active Directory"
 Write-Output ""
-Write-Output "------------------------------------------------------"
+Write-Output "----------------------------------------------------------"
     if ($verboseOutputSet){
     Write-Output "[ERROR MESSAGE BELOW]"
     Write-Output "-----------------------------"

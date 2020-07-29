@@ -113,9 +113,48 @@ if ($contextInSet){
     }
 }
 
+function  Get-DistinguishedName {
+    param (
+        [Parameter(Mandatory,
+        ParameterSetName = 'Input')]
+        [string[]]
+        $CanonicalName,
+
+        [Parameter(Mandatory,
+            ValueFromPipeline,
+            ParameterSetName = 'Pipeline')]
+        [string]
+        $InputObject
+    )
+    process {
+        if ($PSCmdlet.ParameterSetName -eq 'Pipeline') {
+            $arr = $_ -split '/'
+            [array]::reverse($arr)
+            $output = @()
+            $output += $arr[0] -replace '^.*$', '$0'
+            $output += ($arr | select -Skip 1 | select -SkipLast 1) -replace '^.*$', 'OU=$0'
+            $output += ($arr | ? { $_ -like '*.*' }) -split '\.' -replace '^.*$', 'DC=$0'
+            $output -join ','
+        }
+        else {
+            foreach ($cn in $CanonicalName) {
+                $arr = $cn -split '/'
+                [array]::reverse($arr)
+                $output = @()
+                $output += $arr[0] -replace '^.*$', '$0'
+                $output += ($arr | select -Skip 1 | select -SkipLast 1) -replace '^.*$', 'OU=$0'
+                $output += ($arr | ? { $_ -like '*.*' }) -split '\.' -replace '^.*$', 'DC=$0'
+                $output -join ','
+            }
+        }
+    }
+}
+
+
 Write-Output ""
 Write-Output "Following is a list of all of the users."
-Write-Output "---------------------------------------"
+Write-Output ""
+Write-Output "------------------------------------------------------"
 
 function LIST_USERS
 { 
@@ -134,7 +173,8 @@ LIST_USERS
 
 if ($listUsersResult)
 {
-Write-Output "---------------------------------------"
+
+Write-Output "------------------------------------------------------"
 }else{
 Write-Output "Error: Unable to List Users in Active Directory"
 Write-Output ""
