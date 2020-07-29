@@ -1089,6 +1089,8 @@ $userManagementFolderIdThree = ( $userManagementFolderIdTwo | %{ $_.Split(':')[1
 
 $userManagementFolderId = $userManagementFolderIdThree.Trim()
 
+Invoke-RestMethod -Uri $uri/apps/$userManagementFolderId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
+
 
 # Confirm/Create the ACTIVE DIRECTORY | DELEGATE | USER MANAGEMENT | USER ACCESS folder
 
@@ -1191,10 +1193,6 @@ Write-Output "${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_US
 CREATE_CIMITRA_FOLDER_ENTITY "${ACTIVE_DIRECTORY_USER_REMOVE_CHANGE_DELETE_FOLDER_LABEL}" "Cimitra Active Directory Integration ${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_MANAGEMENT_FOLDER_LABEL} | ${ACTIVE_DIRECTORY_USER_REMOVE_CHANGE_DELETE_FOLDER_LABEL} App Delegation Folder." "$userManagementFolderId"
 }
 
-
-
-
-# BLISS
 
 Invoke-RestMethod -Uri $uri/apps/$delegateFolderId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
 
@@ -1335,6 +1333,9 @@ CREATE_CIMITRA_APP "ENABLE USER ACCOUNT" "EnableUserAccount.ps1" "${adUserAccess
 
 $jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\ListUsersDisabled.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"LIST DISABLED ACCOUNTS`",`"notes`":`" `",`"description`":`"List Disabled User Accounts in Active Directory`",`"parentFolderId`":`"${adUserAccessId}`"}"
 CREATE_CIMITRA_APP "LIST DISABLED ACCOUNTS" "ListUsersDisabled.ps1" "${adUserAccessId}" "${adExcludeFolderId}" "$jsonFile"
+ 
+$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\ListUsersNoLogon.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"LIST NO LOGON ACCOUNTS`",`"notes`":`" `",`"description`":`"List User Accounts in Active Directory With No Logon Events`",`"parentFolderId`":`"${adUserReportsId}`"}"
+CREATE_CIMITRA_APP "LIST NO LOGON ACCOUNTS" "ListUsersNoLogon.ps1" "${adUserReportsId}" "${adExcludeFolderId}" "$jsonFile"
  
 
 # COMPUTERS #

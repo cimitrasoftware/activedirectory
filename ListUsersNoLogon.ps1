@@ -116,7 +116,6 @@ if ($contextInSet){
 
 Write-Output ""
 Write-Output "Following is a list of all users who have never logged in."
-Write-Output ""
 Write-Output "----------------------------------------------------------"
 
 function LIST_USERS
