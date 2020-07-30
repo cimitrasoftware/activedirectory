@@ -147,7 +147,7 @@ ShowHelp
 
 
 # This script expects 3 arguments, so if the 3rd argument is blank, then show the Help and exit
-if (!( $firstNameInSet -and $lastNameInSet -and $officePhoneIn )){ 
+if (!( $firstNameInSet -and $lastNameInSet -and $officePhoneInSet )){ 
 ShowHelp
  }
 # -------------------------------------------------
