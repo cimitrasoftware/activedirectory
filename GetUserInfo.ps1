@@ -214,6 +214,7 @@ $theOfficePhone=""
 $theMobilePhone=""
 $theExpireDate=""
 $theAccountStatus=""
+$thePasswordSetDate=""
 $theCreationDate=""
 $theUserSamAccounName=""
 $theUserCnName=""
@@ -227,7 +228,7 @@ try{
  $theTitle=Get-ADUser  -properties title -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select title -ExpandProperty title
 }catch{}
 
-if($theTitle.Length -gt 2){
+if($theTitle.Length -gt 0){
 Write-Output "TITLE: $theTitle"
 }else{
 Write-Output "TITLE: [NONE]"
@@ -237,7 +238,7 @@ try{
  $theDepartment=Get-ADUser  -properties department -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select department -ExpandProperty department 
 }catch{}
 
-if($theDepartment.Length -gt 2){
+if($theDepartment.Length -gt 0){
 Write-Output "DEPARTMENT: $theDepartment"
 }else{
 Write-Output "DEPARTMENT: [NONE]"
@@ -247,7 +248,7 @@ try{
  $theDescription=Get-ADUser  -properties description -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select description -ExpandProperty department 
 }catch{}
 
-if($theDescription.Length -gt 2){
+if($theDescription.Length -gt 0){
 Write-Output "DESCRIPTION: $theDescription"
 }else{
 Write-Output "DESCRIPTION: [NONE]"
@@ -257,7 +258,7 @@ try{
  $theOfficePhone=Get-ADUser  -properties OfficePhone -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select OfficePhone -ExpandProperty OfficePhone 
 }catch{}
 
-if($OfficePhone.Length -gt 2){
+if($OfficePhone.Length -gt 0){
 Write-Output "OFFICE PHONE: $OfficePhone"
 }else{
 Write-Output "OFFICE PHONE: [NONE]"
@@ -267,7 +268,7 @@ try{
  $theMobilePhone=Get-ADUser  -properties MobilePhone -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select MobilePhone -ExpandProperty MobilePhone 
 }catch{}
 
-if($theMobilePhone.Length -gt 2){
+if($theMobilePhone.Length -gt 0){
 Write-Output "MOBILE PHONE: $theMobilePhone"
 }else{
 Write-Output "MOBILE PHONE: [NONE]"
@@ -281,6 +282,17 @@ if($theExpirationDate.Length -gt 2){
 Write-Output "ACCOUNT EXPIRES: $theExpirationDate"
 }else{
 Write-Output "ACCOUNT EXPIRES: [NONE]"
+}
+
+try{
+ $thePasswordSetDate=Get-ADUser -properties PasswordLastSet -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select PasswordLastSet -ExpandProperty PasswordLastSet 
+}catch{}
+
+
+if($thePasswordSetDate.Length -gt 0){
+Write-Output "PASSWORD SET DATE: $thePasswordSetDate"
+}else{
+Write-Output "PASSWORD SET DATE: [NONE]"
 }
 
 
@@ -310,3 +322,4 @@ try{
 Write-Output "DISTINGUISHED NAME: $DN"
 
 
+Write-Output ""
