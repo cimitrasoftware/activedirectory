@@ -32,9 +32,14 @@ $lastNameIn = [string]::join(" ",($lastNameIn.Split("`n"))).Trim()
 
 $lastNameIn = (Get-Culture).TextInfo.ToTitleCase($lastNameIn) 
 
+if(Write-Output $args | Select-String '-contextIn'){
+$departmentIn = ([Regex]'(?is)(?:(?<=\-departmentIn).+(?=-contextIn))').Match(($args -join "`n")).Value 
+$departmentIn = [string]::join(" ",($departmentIn.Split("`n"))).Trim() 
+}else{
 [string]$commandLineIn = $args
 $departmentIn = $commandLineIn -split "(?<=-departmentIn)\s" | Select -Skip 1 -First 1
-
+$departmentIn = [string]::join(" ",($departmentIn.Split("`n"))).Trim() 
+}
 
 
 if(Write-Output $args | Select-String '-contextIn'){

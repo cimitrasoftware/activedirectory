@@ -1,4 +1,4 @@
-﻿# Set User's Mobile Phone in Active Directory
+﻿# Set User's Description in Active Directory
 # Author: Tay Kratzer tay@cimitra.com
 # Change the context variable to match your system
 # -------------------------------------------------
@@ -26,19 +26,20 @@ $firstNameIn = [string]::join(" ",($firstNameIn.Split("`n"))).Trim()
 
 $firstNameIn = (Get-Culture).TextInfo.ToTitleCase($firstNameIn) 
 
-$lastNameIn = ([Regex]'(?is)(?:(?<=\-lastNameIn).+(?=-mobilePhoneIn))').Match(($args -join "`n")).Value 
+$lastNameIn = ([Regex]'(?is)(?:(?<=\-lastNameIn).+(?=-descriptionIn))').Match(($args -join "`n")).Value 
 
 $lastNameIn = [string]::join(" ",($lastNameIn.Split("`n"))).Trim() 
 
 $lastNameIn = (Get-Culture).TextInfo.ToTitleCase($lastNameIn) 
 
+
 if(Write-Output $args | Select-String '-contextIn'){
-$mobilePhoneIn = ([Regex]'(?is)(?:(?<=\-mobilePhoneIn).+(?=-contextIn))').Match(($args -join "`n")).Value 
-$mobilePhoneIn = [string]::join(" ",($mobilePhoneIn.Split("`n"))).Trim() 
+$descriptionIn = ([Regex]'(?is)(?:(?<=\-descriptionIn).+(?=-contextIn))').Match(($args -join "`n")).Value 
+$descriptionIn = [string]::join(" ",($descriptionIn.Split("`n"))).Trim() 
 }else{
 [string]$commandLineIn = $args
-$mobilePhoneIn = $commandLineIn -split "(?<=-mobilePhoneIn)\s" | Select -Skip 1 -First 1
-$mobilePhoneIn = [string]::join(" ",($mobilePhoneIn.Split("`n"))).Trim() 
+$descriptionIn = $commandLineIn -split "(?<=-descriptionIn)\s" | Select -Skip 1 -First 1
+$descriptionIn = [string]::join(" ",($descriptionIn.Split("`n"))).Trim() 
 }
 
 
@@ -46,6 +47,7 @@ if(Write-Output $args | Select-String '-contextIn'){
 $theArgs = $MyInvocation.Line
 $contextIn = $theArgs  -split "(?<=-contextIn)\s" | Select -Skip 1 -First 1
 }
+
 
 if (Write-Output "$args" | Select-String -CaseSensitive "-showErrors" ){
 $verboseOutputSet = $true
@@ -59,8 +61,8 @@ if($lastNameIn.Length -gt 2){
 $lastNameInSet = $true
 }
 
-if($mobilePhoneIn.Length -gt 2){
-$mobilePhoneInSet = $true
+if($descriptionIn.Length -gt 2){
+$descriptionInSet = $true
 }
 
 if($contextIn.Length -gt 2){
@@ -106,7 +108,7 @@ Start-Sleep -s $sleepTime
 function ShowHelp{
 $scriptName = Split-Path -leaf $PSCommandpath
 Write-Host ""
-Write-Host "Set a User's Mobile Phone in Active Directory"
+Write-Host "Set a User's Description in Active Directory"
 Write-Host ""
 Write-Host "[ HELP ]"
 Write-Host ""
@@ -114,29 +116,29 @@ Write-Host ".\$scriptName -h or -help"
 Write-Host ""
 Write-Host "[ SCRIPT USAGE ]"
 Write-Host ""
-Write-Host ".\$scriptName -firstNameIn <user first name> -lastNameIn <user last name> -mobilePhoneIn <mobile phone number> -contextIn <Active Directory context (optional if specified in settings.cfg)>"
+Write-Host ".\$scriptName -firstNameIn <user first name> -lastNameIn <user last name> -descriptionIn <description> -contextIn <Active Directory context (optional if specified in settings.cfg)>"
 Write-Host ""
 Write-Host "-OR-"
 Write-Host ""
-Write-Host ".\$scriptName -setContext <Active Directory context (optional if specified in settings.cfg)> -firstNameIn <user first name> -lastNameIn <user last name> -mobilePhoneIn <mobile phone number> "
+Write-Host ".\$scriptName -setContext <Active Directory context (optional if specified in settings.cfg)> -firstNameIn <user first name> -lastNameIn <user last name> -descriptionIn <description> "
 Write-Host ""
 Write-Host "[ EXAMPLES ]"
 Write-Host ""
-Write-Host "Example: .\$scriptName -firstNameIn Jane -lastNameIn Doe -mobilePhoneIn 801-555-1212"
+Write-Host "Example: .\$scriptName -firstNameIn Jane -lastNameIn Doe -descriptionIn Auditing Department Member"
 Write-Host ""
 Write-Host "-OR-"
 Write-Host ""
-Write-Host "Example: .\$scriptName -setContext OU=USERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com -firstNameIn Jane -lastNameIn Doe -mobilePhoneIn 801-555-1212"
+Write-Host "Example: .\$scriptName -setContext OU=USERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com -firstNameIn Jane -lastNameIn Doe -descriptionIn Auditing Department Member"
 Write-Host ""
 Write-Host "-OR-"
 Write-Host ""
-Write-Host "Example: .\$scriptName -firstNameIn Jane -lastNameIn Doe -mobilePhoneIn 801-555-1212 -contextIn OU=USERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
+Write-Host "Example: .\$scriptName -firstNameIn Jane -lastNameIn Doe -descriptionIn Auditing Department Member -contextIn OU=USERS,OU=DEMO,OU=CIMITRA,DC=cimitrademo,DC=com"
 Write-Host ""
 Write-Host "[ ERROR HANDLING ]"
 Write-Host ""
 Write-Host "-showErrors = Show Error Messages"
 Write-Host ""
-Write-Host "Example: .\$scriptName -showErrors -firstNameIn Jane -lastNameIn Doe -mobilePhoneIn 801-555-1212"
+Write-Host "Example: .\$scriptName -showErrors -firstNameIn Jane -lastNameIn Doe -descriptionIn Auditing Department Member"
 Write-Host ""
 exit 0
 }
@@ -148,7 +150,7 @@ ShowHelp
 
 
 # This script expects 3 arguments, so if the 3rd argument is blank, then show the Help and exit
-if (!( $firstNameInSet -and $lastNameInSet -and $mobilePhoneIn )){ 
+if (!( $firstNameInSet -and $lastNameInSet -and $descriptionInSet )){ 
 ShowHelp
  }
 # -------------------------------------------------
@@ -179,7 +181,7 @@ if ($contextInSet){
 
 # Modify the user
 try{
-Set-ADUser -Identity "CN=${firstNameIn} ${lastNameIn},$context" -MobilePhone "$mobilePhoneIn"
+Set-ADUser -Identity "CN=${firstNameIn} ${lastNameIn},$context" -Department "$descriptionIn"
 }catch{
 $modifyUserResult = $false
 $err = "$_"
@@ -190,11 +192,11 @@ $err = "$_"
 if ($modifyUserResult)
 {
 Write-Output ""
-Write-Output "User: ${firstNameIn} ${lastNameIn} mobile phone changed to: ${mobilePhoneIn} : in Active Directory"
+Write-Output "User: ${firstNameIn} ${lastNameIn} title changed to: ${descriptionIn} : in Active Directory"
 Write-Output ""
 }else{
 Write-Output ""
-Write-Output "User: ${firstNameIn} ${lastNameIn} mobile phone NOT changed in Active Directory"
+Write-Output "User: ${firstNameIn} ${lastNameIn} title phone NOT changed in Active Directory"
 Write-Output ""
     if ($verboseOutputSet){
     Write-Output "[ERROR MESSAGE BELOW]"

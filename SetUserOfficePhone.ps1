@@ -1,4 +1,4 @@
-﻿# Set User's Expire Date in Active Directory
+﻿# Set User's Office Phone in Active Directory
 # Author: Tay Kratzer tay@cimitra.com
 # Change the context variable to match your system
 # -------------------------------------------------
@@ -32,8 +32,13 @@ $lastNameIn = [string]::join(" ",($lastNameIn.Split("`n"))).Trim()
 
 $lastNameIn = (Get-Culture).TextInfo.ToTitleCase($lastNameIn) 
 
-Write-Output $args | Select-String '-officePhoneIn' -Context 0,1 | ForEach-Object {
-$officePhoneIn = $_.Context.PostContext.Trim() 
+if(Write-Output $args | Select-String '-contextIn'){
+$officePhoneIn = ([Regex]'(?is)(?:(?<=\-officePhoneIn).+(?=-contextIn))').Match(($args -join "`n")).Value 
+$officePhoneIn = [string]::join(" ",($officePhoneIn.Split("`n"))).Trim() 
+}else{
+[string]$commandLineIn = $args
+$officePhoneIn = $commandLineIn -split "(?<=-officePhoneIn)\s" | Select -Skip 1 -First 1
+$officePhoneIn = [string]::join(" ",($officePhoneIn.Split("`n"))).Trim() 
 }
 
 if(Write-Output $args | Select-String '-contextIn'){
