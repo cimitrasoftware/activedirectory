@@ -190,11 +190,11 @@ $err = "$_"
 if ($modifyUserResult)
 {
 Write-Output ""
-Write-Output "User: ${firstNameIn} ${lastNameIn} department changed to: ${departmentIn} : in Active Directory"
+Write-Output "User: ${firstNameIn} ${lastNameIn} department changed to: ${departmentIn} "
 Write-Output ""
 }else{
 Write-Output ""
-Write-Output "User: ${firstNameIn} ${lastNameIn} department phone NOT changed in Active Directory"
+Write-Output "User: ${firstNameIn} ${lastNameIn} department NOT changed in Active Directory"
 Write-Output ""
     if ($verboseOutputSet){
     Write-Output "[ERROR MESSAGE BELOW]"

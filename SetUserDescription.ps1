@@ -192,11 +192,11 @@ $err = "$_"
 if ($modifyUserResult)
 {
 Write-Output ""
-Write-Output "User: ${firstNameIn} ${lastNameIn} title changed to: ${descriptionIn} : in Active Directory"
+Write-Output "User: ${firstNameIn} ${lastNameIn} description changed to: ${descriptionIn}"
 Write-Output ""
 }else{
 Write-Output ""
-Write-Output "User: ${firstNameIn} ${lastNameIn} title phone NOT changed in Active Directory"
+Write-Output "User: ${firstNameIn} ${lastNameIn} description NOT changed in Active Directory"
 Write-Output ""
     if ($verboseOutputSet){
     Write-Output "[ERROR MESSAGE BELOW]"

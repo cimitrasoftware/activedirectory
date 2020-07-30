@@ -190,7 +190,7 @@ $err = "$_"
 if ($modifyUserResult)
 {
 Write-Output ""
-Write-Output "User: ${firstNameIn} ${lastNameIn} mobile phone changed to: ${mobilePhoneIn} : in Active Directory"
+Write-Output "User: ${firstNameIn} ${lastNameIn} mobile phone changed to: ${mobilePhoneIn}"
 Write-Output ""
 }else{
 Write-Output ""
