@@ -16,9 +16,32 @@ return 0
 
 }
 
+function CALL_SETUP{
+
+$setupScript = "${PSScriptRoot}\setup.ps1"
+Write-Output "$installScript -functionRun CREATE_CIMITRA_APPS"
+try{
+Set-Location -Path ${PSScriptRoot}
+}catch{
+Write-Output ""
+Write-Output "Error Changing to Directory ${PSScriptRoot}"
+Write-Output ""
+return 0
+}
+
+.\setup.ps1 -runFunction "CREATE_CIMITRA_APPS"
+
+}
+
 write-output "START: INSTALL LATEST VERSION OF CIMITRA/ACTIVE DIRECTORY SCRIPTS"
 write-output "-----------------------------------------------------------------"
 UPDATE_SCRIPTS
 write-output "------------------------------------------------------------------"
 write-output "FINISH: INSTALL LATEST VERSION OF CIMITRA/ACTIVE DIRECTORY SCRIPTS"
+
+write-output "START: RUN SETUP SCRIPT FOR CIMITRA/ACTIVE DIRECTORY INTEGRATION MODULE"
+write-output "-----------------------------------------------------------------------"
+CALL_SETUP
+write-output "------------------------------------------------------------------------"
+write-output "FINISH: RUN SETUP SCRIPT FOR CIMITRA/ACTIVE DIRECTORY INTEGRATION MODULE"
 

@@ -9,7 +9,8 @@ $TEMP_FILE=New-TemporaryFile
 $GLOBAL_TEMP_FILE_TWO=New-TemporaryFile
 $global:cimitraCfgFound = $false
 $global:cimitraAgentId = "Undefined"
-
+$global:runFunction = $false
+$global:functionToRun = ""
 
 
 if (Get-Content C:\cimitra\cimitra.cfg){
@@ -185,6 +186,7 @@ exit 1
 }
 
 function UPDATE_SCRIPTS{
+
 $installScript = "${PSScriptRoot}\install.ps1"
 Write-Output "$installScript ${PSScriptRoot} -skipSetup"
 try{
@@ -1518,6 +1520,21 @@ write-output "------------------------------------------------"
 write-output "FINISH: ADD CIMITRA ACTIVE DIRECTORY INTEGRATION APPS"
 write-output ""
 
+}
+
+if (Write-Output "$args" | Select-String -CaseSensitive "-runFunction" ){
+$runFunction = $true
+$theArgs = $MyInvocation.Line
+$functionToRun = $theArgs  -split "(?<=-runFunction)\s" | Select -Skip 1 -First 1
+}
+
+if($runFunction){
+try{
+$functionToRun
+}catch{
+exit 1
+}
+exit 0
 }
 
 function Show-Menu {
