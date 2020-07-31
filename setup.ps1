@@ -11,6 +11,7 @@ $global:cimitraCfgFound = $false
 $global:cimitraAgentId = "Undefined"
 
 
+
 if (Get-Content C:\cimitra\cimitra.cfg){
 (Get-Content C:\cimitra\cimitra.cfg) | % {$_ -replace '"',''}|Out-File $TEMP_FILE
 $global:cimitraCfgFound = $true
@@ -399,9 +400,9 @@ $response = Invoke-WebRequest -Uri "${URL}" `
 "Authorization"="Bearer $token"
 } `
 -ContentType "application/json" `
+-Body "{`"type`":2,`"status`":`"active`",`"description`":`"${FolderDescriptionIn}`",`"name`":`"${FolderNameIn}`",`"parentFolderId`":`"${ParentFolderIdIn}`"}"
 
 }
-
 
 
 
@@ -472,7 +473,9 @@ $theResponse = Invoke-WebRequest -Uri "${URL}" `
 
 function ESTABLISH_CIMITRA_API_SESSION{
 
-$global:uri = "https://${CIMITRA_SERVER_ADDRESS}:${CIMITRA_SERVER_PORT}/api"
+$uri = "https://${CIMITRA_SERVER_ADDRESS}:${CIMITRA_SERVER_PORT}/api"
+
+$global:uri = "${uri}"
 
 $payload = @{
     email = $CIMITRA_SERVER_ADMIN_ACCOUNT;
@@ -482,6 +485,7 @@ $payload = @{
 $response = Invoke-RestMethod -Uri $uri/users/login -Method POST -Body $payload -ContentType "application/json"
 
 $token = $response.token 
+
 
 $global:token = $response.token 
 
@@ -524,14 +528,14 @@ write-output "START: CHECK CIMITRA INTEGRATION ADMIN USER SETTINGS"
 write-output "----------------------------------------------------"
 
 write-output ""
-write-output "START: Establish API Sessions With Cimitra Server"
+write-output "START: Establish API Session With Cimitra Server"
 write-output "-------------------------------------------------"
 
 
 ESTABLISH_CIMITRA_API_SESSION
 
 write-output ""
-write-output "FINISH: Establish API Sessions With Cimitra Server"
+write-output "FINISH: Establish API Session With Cimitra Server"
 write-output "--------------------------------------------------"
 
 
@@ -730,8 +734,6 @@ Write-Output "Error: Cannot Create or Discover the Folder: ${ACTIVE_DIRECTORY_DE
 Remove-Item -Path $TEMP_FILE_ONE -Force
 exit 1
 }
-
-# BLISS
 
 # Get the ACTIVE DIRECTORY | DELGATE | USER MANAGEMENT | USER ACCESS folder
 
@@ -937,7 +939,15 @@ function CREATE_FOLDER_STRUCTURE{
 
 $TEMP_FILE_ONE=New-TemporaryFile
 
+Write-Output "FOLDER URI = $uri"
+
+
 Invoke-RestMethod -Uri $uri/apps -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
+
+
+Get-Content $TEMP_FILE_ONE
+
+
 
 # Get Home Folder
 
@@ -953,7 +963,15 @@ Remove-Item -Path $TEMP_FILE_ONE -Force
 
 # Get Children of Home Folder
 
+Write-Output "ROOT FOLDER ID: ${rootFolderId}"
+
+Write-Output "Invoke-RestMethod -Uri $uri/apps/$rootFolderId/children -Method GET -Headers $headers -UseBasicParsing"
+
 Invoke-RestMethod -Uri $uri/apps/$rootFolderId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
+
+Write-Output "$TEMP_FILE_ONE"
+
+# Invoke-RestMethod -Uri $uri/apps/$rootFolderId/children -Method GET -Headers $headers -UseBasicParsing
 
 $CONFIG_IO="${PSScriptRoot}\config_reader.ps1"
 
@@ -966,6 +984,10 @@ $CONFIG=(ReadFromConfigFile "${PSScriptRoot}\settings.cfg") 2>&1 | out-null
 Set-Variable -Name ACTIVE_DIRECTORY_MAIN_FOLDER -Value 'ACTIVE DIRECTORY'
 
 # See if the ACTIVE DIRECTORY folder exists, if not create it
+
+Get-Content "$TEMP_FILE_ONE"
+
+
 
 if ((Get-Content "$TEMP_FILE_ONE" | Select-String -CaseSensitive ": ${ACTIVE_DIRECTORY_MAIN_FOLDER}" )){
 Write-Output ""
@@ -1018,7 +1040,7 @@ if ( $CONFIRM_DELEGATE_FOLDER )
 { 
 Set-Variable -Name ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL -Value $CONFIG$ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL }
 else{
-Set-Variable -Name ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL -Value 'DELGATE' 
+Set-Variable -Name ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL -Value 'DELEGATE' 
 }
 
 if ((Get-Content "$TEMP_FILE_ONE" | Select-String -CaseSensitive "\b${ACTIVE_DIRECTORY_DELEGATED_FOLDER_LABEL}\b" )){
@@ -1304,6 +1326,7 @@ GET_FOLDER_IDS
 
 
 $scriptRoot = Write-Output "${PSScriptRoot}" | % {$_ -replace '\\','\\'}
+
 
 
 # CREATE_CIMITRA_LINK_ENTITY "LINK NAME" "LINK DESCRIPTION" "LINK URL" "PARENT FOLDER"
