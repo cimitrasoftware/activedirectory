@@ -368,12 +368,39 @@ write-output ""
 
 }
 
+
+function CHECK_FOR_EXISTING_LINK{
+
+$ParentFolderIdIn=$args[0]
+$LinkLocationIn=$args[2]
+
+$TEMP_FILE_ONE=New-TemporaryFile
+$TEMP_FILE_TWO=New-TemporaryFile
+
+Invoke-RestMethod -Uri $uri/apps/$ParentFolderIdIn/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
+
+if ((Get-Content "$TEMP_FILE_ONE" | Select-String -CaseSensitive "\b${LinkLocationIn}\b" )){
+Remove-Item -Path $TEMP_FILE_ONE -Force 2>&1 | out-null
+return $true
+}else{
+Remove-Item -Path $TEMP_FILE_ONE -Force 2>&1 | out-null
+return $false
+}
+
+}
+
 function CREATE_CIMITRA_LINK_ENTITY{
 
 $LinkNameIn=$args[0]
 $LinkDescriptionIn=$args[1]
 $LinkURL=$args[2]
 $ParentFolderIdIn=$args[3]
+
+# BLISS
+if ( CHECK_FOR_EXISTING_LINK "${ParentFolderIdIn}" "${LinkURL}" ){
+return
+}
+
 
 $URL = "$uri/apps"
 
