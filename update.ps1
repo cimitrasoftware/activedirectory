@@ -29,7 +29,7 @@ Write-Output ""
 return 0
 }
 
-.\setup.ps1 -runFunction "CREATE_CIMITRA_APPS"
+.\setup.ps1 -runFunctionCreateApps
 
 }
 
