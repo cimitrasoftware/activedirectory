@@ -1306,8 +1306,6 @@ GET_FOLDER_IDS
 $scriptRoot = Write-Output "${PSScriptRoot}" | % {$_ -replace '\\','\\'}
 
 
-function CREATE_CIMITRA_APPS{
-
 # CREATE_CIMITRA_LINK_ENTITY "LINK NAME" "LINK DESCRIPTION" "LINK URL" "PARENT FOLDER"
 
 CREATE_CIMITRA_LINK_ENTITY "CIMITRA/ACTIVE DIRECTORY DOCS" "Cimitra Active Directory Integration Module Documentation" "https://www.cimitra.com/addocs" "${adRootFolderId}"
@@ -1537,7 +1535,7 @@ do
     $selection = Read-Host "Please make a selection"
     switch ($selection)
     {
-      '1' {
+    '1' {
          PROMPT_FOR_CIMITRA_SERVER_CREDENTIALS
     } '2' {
          CHECK_CONNECTIVITY
