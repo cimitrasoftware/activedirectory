@@ -1508,8 +1508,8 @@ CREATE_CIMITRA_APP "REMOVE COMPUTER" "RemoveComputer.ps1" "${adComputerFolderId}
 
 CREATE_CIMITRA_LINK_ENTITY "CHECK FOR LATEST UPDATE" "Cimitra Active Directory Integration Module Update Info Documentation on GitHub" "https://github.com/cimitrasoftware/activedirectory/blob/master/update_info" "${adAdminFolderId}"
 
-$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\update.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"UPDATE THIS MODULE`",`"notes`":`" `",`"description`":`"Install the lastest version of the Cimitra/Active Directory Integration Module.`",`"parentFolderId`":`"${adAdminFolderId}`"}"
-CREATE_CIMITRA_APP "UPDATE THIS MODULE" "update.ps1" "${adAdminFolderId}" "${adExcludeFolderId}" "$jsonFile"
+$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\update.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"UPDATE INTEGRATION MODULE`",`"notes`":`" `",`"description`":`"Install the lastest version of the Cimitra/Active Directory Integration Module.`",`"parentFolderId`":`"${adAdminFolderId}`"}"
+CREATE_CIMITRA_APP "UPDATE INTEGRATION MODULE" "update.ps1" "${adAdminFolderId}" "${adExcludeFolderId}" "$jsonFile"
 
 
 # ACTIVE DIRECTORY
