@@ -185,8 +185,8 @@ exit 1
 }
 
 function UPDATE_SCRIPTS{
-$isntallScript = "${PSScriptRoot}\install.ps1"
-Write-Output "$isntallScript ${PSScriptRoot} -skipSetup"
+$installScript = "${PSScriptRoot}\install.ps1"
+Write-Output "$installScript ${PSScriptRoot} -skipSetup"
 try{
 Set-Location -Path ${PSScriptRoot}
 }catch{
@@ -1474,6 +1474,14 @@ CREATE_CIMITRA_APP "LIST ALL COMPUTERS IN AD TREE" "ListComputersDistinguishedNa
 
 $jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-computerNameIn `",`"value`":`"`",`"label`":`"Computer Name`",`"regex`":`"/^[0-9A-Za-z_+-=]+`$/`",`"placeholder`":`"WIN_COMPUTER_ONE`"}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\RemoveComputer.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"REMOVE COMPUTER`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_COMPUTER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Remove a Computer From Active Directory`",`"parentFolderId`":`"${adComputerFolderId}`"}"
 CREATE_CIMITRA_APP "REMOVE COMPUTER" "RemoveComputer.ps1" "${adComputerFolderId}" "${adExcludeFolderId}" "$jsonFile"
+
+# UPDATE UTILITY
+
+CREATE_CIMITRA_LINK_ENTITY "CHECK FOR LATEST UPDATE" "Cimitra Active Directory Integration Module Update Info Documentation on GitHub" "https://github.com/cimitrasoftware/activedirectory/blob/master/update_info" "${adAdminFolderId}"
+
+$jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\update.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"UPDATE THIS MODULE`",`"notes`":`" `",`"description`":`"Install the lastest version of the Cimitra/Active Directory Integration Module.`",`"parentFolderId`":`"${adAdminFolderId}`"}"
+CREATE_CIMITRA_APP "UPDATE THIS MODULE" "update.ps1" "${adAdminFolderId}" "${adExcludeFolderId}" "$jsonFile"
+
 
 # ACTIVE DIRECTORY
 # adRootFolderId
