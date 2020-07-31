@@ -1549,20 +1549,11 @@ write-output ""
 
 }
 
-if (Write-Output "$args" | Select-String -CaseSensitive "-runFunction" ){
-$runFunction = $true
-$theArgs = $MyInvocation.Line
-$functionToRun = $theArgs  -split "(?<=-runFunction)\s" | Select -Skip 1 -First 1
-}
-
-if($runFunction){
-try{
-$functionToRun
-}catch{
-exit 1
-}
+if (Write-Output "$args" | Select-String -CaseSensitive "-runFunctionCreateApps" ){
+CREATE_CIMITRA_APPS
 exit 0
 }
+
 
 function Show-Menu {
     param (

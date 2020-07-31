@@ -19,7 +19,7 @@ return 0
 function CALL_SETUP{
 
 $setupScript = "${PSScriptRoot}\setup.ps1"
-Write-Output "$installScript -functionRun CREATE_CIMITRA_APPS"
+Write-Output "$setupScript -runFunctionCreateApps"
 try{
 Set-Location -Path ${PSScriptRoot}
 }catch{
