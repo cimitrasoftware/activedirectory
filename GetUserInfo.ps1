@@ -169,29 +169,6 @@ if ($contextInSet){
 # User 
 
 
-try{
-Enable-ADAccount -Identity "CN=${firstNameIn} ${lastNameIn},$context" 2>&1 | out-null 
- }catch{
- $modifyUserResult = $false
- $err = "$_"
- }
-
- if (!($modifyUserResult)){
- Write-Output ""
- Write-Output "Cannot Get User Info for: ${firstNameIn} ${LastNameIn}"
-Write-Output ""
-    if ($verboseOutputSet){
-    Write-Output "[ERROR MESSAGE BELOW]"
-    Write-Output "-----------------------------"
-    Write-Output ""
-    Write-Output $err
-    Write-Output ""
-    Write-Output "-----------------------------"
-    }
-
-
- }
-
 # User Name
 # Title
 # Department
@@ -212,8 +189,8 @@ $theDepartment=""
 $theDescription=""
 $theOfficePhone=""
 $theMobilePhone=""
-$theExpireDate=""
-$theAccountStatus=""
+$theExpirationDate=""
+$global:theAccountStatus = $true
 $thePasswordSetDate=""
 $theCreationDate=""
 $theUserSamAccounName=""
@@ -222,67 +199,73 @@ $theUserCnName=""
 
 
 Write-Output ""
-Write-Output "FULL NAME: ${firstNameIn} ${LastNameIn}"
+Write-Output "FULL NAME:  ${firstNameIn} ${LastNameIn}"
 
 try{
  $theTitle=Get-ADUser  -properties title -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select title -ExpandProperty title
 }catch{}
 
 if($theTitle.Length -gt 0){
-Write-Output "TITLE: $theTitle"
+Write-Output "TITLE:  $theTitle"
 }else{
-Write-Output "TITLE: [NONE]"
+Write-Output "TITLE:  [NONE]"
 }
+
 
 try{
  $theDepartment=Get-ADUser  -properties department -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select department -ExpandProperty department 
 }catch{}
 
 if($theDepartment.Length -gt 0){
-Write-Output "DEPARTMENT: $theDepartment"
+Write-Output "DEPARTMENT:  $theDepartment"
 }else{
-Write-Output "DEPARTMENT: [NONE]"
+Write-Output "DEPARTMENT:  [NONE]"
 }
 
+
 try{
- $theDescription=Get-ADUser  -properties description -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select description -ExpandProperty department 
+ $theDescription=Get-ADUser  -properties description -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select description -ExpandProperty description
 }catch{}
 
 if($theDescription.Length -gt 0){
-Write-Output "DESCRIPTION: $theDescription"
+Write-Output "DESCRIPTION:  $theDescription"
 }else{
-Write-Output "DESCRIPTION: [NONE]"
+Write-Output "DESCRIPTION:  [NONE]"
 }
+
 
 try{
- $theOfficePhone=Get-ADUser  -properties OfficePhone -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select OfficePhone -ExpandProperty OfficePhone 
+ $theOfficePhone=Get-ADUser -properties OfficePhone -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select OfficePhone -ExpandProperty OfficePhone 
 }catch{}
 
-if($OfficePhone.Length -gt 0){
-Write-Output "OFFICE PHONE: $OfficePhone"
+if($theOfficePhone.Length -gt 0){
+Write-Output "OFFICE PHONE:  $theOfficePhone"
 }else{
-Write-Output "OFFICE PHONE: [NONE]"
+Write-Output "OFFICE PHONE:  [NONE]"
 }
+
 
 try{
  $theMobilePhone=Get-ADUser  -properties MobilePhone -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select MobilePhone -ExpandProperty MobilePhone 
 }catch{}
 
 if($theMobilePhone.Length -gt 0){
-Write-Output "MOBILE PHONE: $theMobilePhone"
+Write-Output "MOBILE PHONE:  $theMobilePhone"
 }else{
-Write-Output "MOBILE PHONE: [NONE]"
+Write-Output "MOBILE PHONE:  [NONE]"
 }
+
 
 try{
- $theExpirationDate=Get-ADUser  -properties AccountExpirationDate -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select AccountExpirationDate -ExpandProperty AccountExpirationDate 
-}catch{}
+ $theExpirationDate=Get-ADUser -properties AccountExpirationDate -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select AccountExpirationDate -ExpandProperty AccountExpirationDate 
+ }catch{}
 
-if($theExpirationDate.Length -gt 2){
-Write-Output "ACCOUNT EXPIRES: $theExpirationDate"
+if($theExpirationDate.Length -gt 0){
+Write-Output "ACCOUNT EXPIRES:  $theExpirationDate"
 }else{
-Write-Output "ACCOUNT EXPIRES: [NONE]"
+Write-Output "ACCOUNT EXPIRES:  [NO EXPIRATION DATE]"
 }
+
 
 try{
  $thePasswordSetDate=Get-ADUser -properties PasswordLastSet -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select PasswordLastSet -ExpandProperty PasswordLastSet 
@@ -290,36 +273,44 @@ try{
 
 
 if($thePasswordSetDate.Length -gt 0){
-Write-Output "PASSWORD SET DATE: $thePasswordSetDate"
+Write-Output "PASSWORD SET DATE:  $thePasswordSetDate"
 }else{
-Write-Output "PASSWORD SET DATE: [NONE]"
+Write-Output "PASSWORD SET DATE:  [NONE]"
 }
 
 
 try{
- $theAccountStatus=Get-ADUser  -properties Enabled -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select Enabled -ExpandProperty Enabled 
+ $theAccountStatus=Get-ADUser -properties Enabled -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select Enabled -ExpandProperty Enabled 
 }catch{}
 
+if($theAccountStatus){
+Write-Output "ACCOUNT ENABLED:  YES"
+}else{
+Write-Output "ACCOUNT ENABLED:  NO"
+}
 
-Write-Output "ACCOUNT ENABLED: $theAccountStatus"
 
 try{
  $theCreationDate=Get-ADUser  -properties Created -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select Created -ExpandProperty Created 
 }catch{}
+
+Write-Output "Account Creation Date:  $theCreationDate"
+
 
 try{
  $theUserSamAccounName=Get-ADUser  -properties SamAccountName -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select SamAccountName -ExpandProperty SamAccountName 
 }catch{}
 
 
-Write-Output "SamAccountName: $theUserSamAccounName"
+Write-Output "SamAccountName:  $theUserSamAccounName"
+
 
 try{
  $DN=Get-ADUser  -properties DistinguishedName -Identity "CN=${firstNameIn} ${lastNameIn},$context" | select DistinguishedName -ExpandProperty DistinguishedName 
 }catch{}
 
-
-Write-Output "DISTINGUISHED NAME: $DN"
+ 
+Write-Output "DISTINGUISHED NAME:  $DN"
 
 
 Write-Output ""

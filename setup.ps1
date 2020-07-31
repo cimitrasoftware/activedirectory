@@ -1,7 +1,6 @@
 ﻿# Check Password Set Date in Active Directory
 # Author: Tay Kratzer tay@cimitra.com
 # -------------------------------------------------
-# New-Variable -Name CIMITRA_SERVER_ADDRESS -Value '127.0.0.1'
 # $CIMITRA_SERVER_ADDRESS='127.0.0.1'
 
 # If a settings.cfg file exists read it and get the Active Directory Context from this file
@@ -174,8 +173,6 @@ Set-Variable -Name CIMITRA_SERVER_ADMIN_PASSWORD -Value 'changeme'
 
 }
 
- 
-
 }
 
 function CALL_ERROR_EXIT{
@@ -199,6 +196,7 @@ return 0
 }
 
 .\install.ps1 "${PSScriptRoot}" "-skipSetup"
+
 }
 
 
@@ -367,6 +365,26 @@ write-output ""
 
 }
 
+function CREATE_CIMITRA_LINK_ENTITY{
+
+$LinkNameIn=$args[0]
+$LinkDescriptionIn=$args[1]
+$LinkURL=$args[2]
+$ParentFolderIdIn=$args[3]
+
+$URL = "$uri/apps"
+
+$response = Invoke-WebRequest -Uri "${URL}" `
+-Method "POST" `
+-Headers @{
+"Authorization"="Bearer $token"
+} `
+-ContentType "application/json" `
+-Body "{`"type`":3,`"status`":`"active`",`"url`":`"${LinkURL}`",`"name`":`"${LinkNameIn}`",`"description`":`"${LinkDescriptionIn}`",`"parentFolderId`":`"${ParentFolderIdIn}`"}"
+}
+
+
+
 function CREATE_CIMITRA_FOLDER_ENTITY{
 
 $FolderNameIn=$args[0]
@@ -381,9 +399,11 @@ $response = Invoke-WebRequest -Uri "${URL}" `
 "Authorization"="Bearer $token"
 } `
 -ContentType "application/json" `
--Body "{`"type`":2,`"status`":`"active`",`"description`":`"${FolderDescriptionIn}`",`"name`":`"${FolderNameIn}`",`"parentFolderId`":`"${ParentFolderIdIn}`"}"
 
 }
+
+
+
 
 function CHECK_FOR_EXISTING_APP{
 
@@ -587,7 +607,7 @@ exit 1
 }
 
 # Get the ACTIVE DIRECTORY | ADMIN folder
-# BLISS
+
 $CONFIRM_ADMIN_FOLDER=(ConfirmFromConfigFile "${PSScriptRoot}\settings.cfg" "ACTIVE_DIRECTORY_ADMIN_FOLDER_LABEL")
 
 if ( $CONFIRM_ADMIN_FOLDER ) 
@@ -1285,6 +1305,17 @@ GET_FOLDER_IDS
 
 $scriptRoot = Write-Output "${PSScriptRoot}" | % {$_ -replace '\\','\\'}
 
+
+function CREATE_CIMITRA_APPS{
+
+# CREATE_CIMITRA_LINK_ENTITY "LINK NAME" "LINK DESCRIPTION" "LINK URL" "PARENT FOLDER"
+
+CREATE_CIMITRA_LINK_ENTITY "CIMITRA/ACTIVE DIRECTORY DOCS" "Cimitra Active Directory Integration Module Documentation" "https://www.cimitra.com/addocs" "${adRootFolderId}"
+
+CREATE_CIMITRA_LINK_ENTITY "What is The ADMIN Folder For?" "Cimitra Active Directory Integration Module Documentation" "https://www.cimitra.com/addocs" "${adAdminFolderId}"
+
+CREATE_CIMITRA_LINK_ENTITY "What is The EXCLUDE Folder For?" "Cimitra Active Directory Integration Module Documentation" "https://www.cimitra.com/addocs" "${adExcludeFolderId}"
+
 ###########################
 ###########################
 #*****USER MANAGEMENT*****#
@@ -1435,23 +1466,38 @@ CREATE_CIMITRA_APP "RENAME COMPUTER" "RenameComputer.ps1" "${adComputerFolderId}
 $jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\ListComputersDistinguishedNames.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"LIST ALL COMPUTERS IN AD TREE`",`"notes`":`" `",`"description`":`"List All Computers in an Entire Active Directory Tree`",`"parentFolderId`":`"${adComputerFolderId}`"}"
 CREATE_CIMITRA_APP "LIST ALL COMPUTERS IN AD TREE" "ListComputersDistinguishedNames.ps1" "${adComputerFolderId}" "${adExcludeFolderId}" "$jsonFile"
 
-
 $jsonFile = "{`"type`":1,`"status`":`"active`",`"platform`":`"win32`",`"injectParams`":[{`"param`":`"-computerNameIn `",`"value`":`"`",`"label`":`"Computer Name`",`"regex`":`"/^[0-9A-Za-z_+-=]+`$/`",`"placeholder`":`"WIN_COMPUTER_ONE`"}],`"interpreter`":`"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`",`"command`":`"${scriptRoot}\\RemoveComputer.ps1`",`"params`":`" -showErrors `",`"agentId`":`"${cimitraAgentId}`",`"name`":`"REMOVE COMPUTER`",`"notes`":`"NOTE - Make sure that in the file 'settings.cfg' the 'AD_COMPUTER_CONTEXT' value is properly configured with the Active Directory Context where this script is supposed to be looking to.`",`"description`":`"Remove a Computer From Active Directory`",`"parentFolderId`":`"${adComputerFolderId}`"}"
 CREATE_CIMITRA_APP "REMOVE COMPUTER" "RemoveComputer.ps1" "${adComputerFolderId}" "${adExcludeFolderId}" "$jsonFile"
 
+# ACTIVE DIRECTORY
+# adRootFolderId
+
+#ADMIN
+# adAdminFolderId
+
+# DELEGATE
 # $adUserFolderId
 
-# $adComputerFolderId
+# EXCLUDE
+# adExcludeFolderId
 
+# USER ACCESS
 # $adUserAccessId
 
+# USER CHANGES
 # $adUserChangesId
 
+# USER REPORTS
 # $adUserReportsId
 
+# <USER> CREATE
+# $adUserCreateId
+
+# <USER> REMOVE/CHANGE/DELETE
 # $adUserRemoveId
 
-# $adUserCreateId
+# COMPUTERS
+# $adComputerFolderId
 
 
 write-output "------------------------------------------------"
@@ -1469,19 +1515,19 @@ function Show-Menu {
     Write-Host "| Cimitra Active Directory Integration Main Menu |"
     Write-Host "-------------------------------------------------"
     Write-Host "" 
-    Write-Host "[1] Configure Cimitra Integration Admin User"
+    Write-Host "[1] CONFIGURE Cimitra Integration Admin User"
     Write-Host "" 
-    Write-Host "[2] Check Cimitra Integration Admin User Configuration"
+    Write-Host "[2] CHECK Cimitra Integration Admin User Configuration"
     Write-Host "" 
-    Write-Host "[3] Add Active Directory Integration"
+    Write-Host "[3] CONFIGURE Active Directory Users Context"
     Write-Host "" 
-    Write-Host "[4] Configure Active Directory Users Context"
+    Write-Host "[4] CONFIGURE Active Directory Computers Context"
     Write-Host "" 
-    Write-Host "[5] Configure Active Directory Computers Context"
+    Write-Host "[5] INSTALL Active Directory Integration Apps (scripts)"
     Write-Host "" 
-    Write-Host "[6] Update This Integration Module from GitHub"
+    Write-Host "[6] UPDATE This Integration Module from GitHub"
     Write-Host "" 
-    Write-Host "[7] Exit"
+    Write-Host "[7] EXIT"
     Write-Host "" 
 }
 
@@ -1491,16 +1537,16 @@ do
     $selection = Read-Host "Please make a selection"
     switch ($selection)
     {
-    '1' {
+      '1' {
          PROMPT_FOR_CIMITRA_SERVER_CREDENTIALS
     } '2' {
          CHECK_CONNECTIVITY
     } '3' {
-         CREATE_CIMITRA_APPS
-    } '4' {
          PROMPT_FOR_AD_USER
-    } '5' {
+    } '4' {
          PROMPT_FOR_AD_COMPUTER
+    } '5' {
+         CREATE_CIMITRA_APPS
     } '6' {
          UPDATE_SCRIPTS
     } '7' {

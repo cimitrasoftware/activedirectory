@@ -193,8 +193,7 @@ $global:forcePasswordResetSet = $true
 if ($modifyUserResult)
 {
 Write-Output ""
-Write-Output "User: ${firstNameIn} ${lastNameIn} password changed in Active Directory"
-Write-Output ""
+Write-Output "User: ${firstNameIn} ${lastNameIn} password changed"
 }else{
 Write-Output ""
 Write-Output "User: ${firstNameIn} ${lastNameIn} password was NOT changed in Active Directory"

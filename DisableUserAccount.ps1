@@ -179,8 +179,32 @@ Write-Output ""
     Write-Output ""
     Write-Output "-----------------------------"
     }
-
+exit
 
  }
+
+ try{
+ Set-ADUser -Identity "CN=${firstNameIn} ${lastNameIn},$context" -Enabled $false  
+ }catch{
+ $modifyUserResult = $false
+ $err = "$_"
+ }
+
+  if (!($modifyUserResult)){
+ Write-Output ""
+ Write-Output "Account for User: ${firstNameIn} ${LastNameIn} NOT Fully Disabled"
+Write-Output ""
+    if ($verboseOutputSet){
+    Write-Output "[ERROR MESSAGE BELOW]"
+    Write-Output "-----------------------------"
+    Write-Output ""
+    Write-Output $err
+    Write-Output ""
+    Write-Output "-----------------------------"
+    }
+
+ }
+
+
 
 

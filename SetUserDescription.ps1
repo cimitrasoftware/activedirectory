@@ -181,7 +181,7 @@ if ($contextInSet){
 
 # Modify the user
 try{
-Set-ADUser -Identity "CN=${firstNameIn} ${lastNameIn},$context" -Department "$descriptionIn"
+Set-ADUser -Identity "CN=${firstNameIn} ${lastNameIn},$context" -Description "$descriptionIn"
 }catch{
 $modifyUserResult = $false
 $err = "$_"
