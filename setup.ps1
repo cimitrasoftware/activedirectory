@@ -939,14 +939,8 @@ function CREATE_FOLDER_STRUCTURE{
 
 $TEMP_FILE_ONE=New-TemporaryFile
 
-Write-Output "FOLDER URI = $uri"
-
 
 Invoke-RestMethod -Uri $uri/apps -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
-
-
-Get-Content $TEMP_FILE_ONE
-
 
 
 # Get Home Folder
@@ -963,15 +957,9 @@ Remove-Item -Path $TEMP_FILE_ONE -Force
 
 # Get Children of Home Folder
 
-Write-Output "ROOT FOLDER ID: ${rootFolderId}"
-
-Write-Output "Invoke-RestMethod -Uri $uri/apps/$rootFolderId/children -Method GET -Headers $headers -UseBasicParsing"
 
 Invoke-RestMethod -Uri $uri/apps/$rootFolderId/children -Method GET -Headers $headers -UseBasicParsing > $TEMP_FILE_ONE
 
-Write-Output "$TEMP_FILE_ONE"
-
-# Invoke-RestMethod -Uri $uri/apps/$rootFolderId/children -Method GET -Headers $headers -UseBasicParsing
 
 $CONFIG_IO="${PSScriptRoot}\config_reader.ps1"
 
@@ -984,9 +972,6 @@ $CONFIG=(ReadFromConfigFile "${PSScriptRoot}\settings.cfg") 2>&1 | out-null
 Set-Variable -Name ACTIVE_DIRECTORY_MAIN_FOLDER -Value 'ACTIVE DIRECTORY'
 
 # See if the ACTIVE DIRECTORY folder exists, if not create it
-
-Get-Content "$TEMP_FILE_ONE"
-
 
 
 if ((Get-Content "$TEMP_FILE_ONE" | Select-String -CaseSensitive ": ${ACTIVE_DIRECTORY_MAIN_FOLDER}" )){
